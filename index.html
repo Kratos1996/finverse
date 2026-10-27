@@ -5,8 +5,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Finverse · Smart Money Calculators</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap"
     rel="stylesheet">
   <style>
     * {
@@ -67,7 +69,7 @@
     body {
       background: var(--bg);
       color: var(--fg);
-      font: 15px/1.5 Inter, system-ui, -apple-system, sans-serif;
+      font: 15px/1.5 'Noto Sans Devanagari', Inter, system-ui, -apple-system, sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
       transition: background .4s
@@ -142,7 +144,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px
+      gap: 10px;
+      flex-wrap: wrap
     }
 
     .logo {
@@ -918,11 +921,11 @@
   <div class="wrap">
     <div class="top">
       <div class="logo"><i></i>Finverse</div>
-      <div class="ctl"><select id="cur" aria-label="Currency"></select><button class="pill" id="th"
+      <div class="ctl"><select id="lang" aria-label="Language"><option value="en">English</option><option value="hi">हिन्दी</option></select><select id="cur" aria-label="Currency"></select><button class="pill" id="th"
           aria-label="Toggle theme">◐</button></div>
     </div>
-    <h1>Money maths,<br><span class="gt">made magical.</span></h1>
-    <p class="sub">Seven calculators for investing, saving, borrowing and lending, plus a plain-English guide to every
+    <h1 id="hero-title">Money maths,<br><span class="gt">made magical.</span></h1>
+    <p class="sub" id="hero-sub">Seven calculators for investing, saving, borrowing and lending, plus a plain-English guide to every
       live LIC insurance plan. Drag a slider and watch the numbers come alive.</p>
     <nav class="tabs" id="tabs"></nav>
     <div class="grid" id="cv">
@@ -953,197 +956,833 @@
     </div>
     <section id="iv" hidden></section>
     <footer class="glass cp">
-      <div class="cn">© 2026 Prem Sagar Sharma. All rights reserved.</div>
+      <div class="cn" id="ft-copy">© 2026 Prem Sagar Sharma. All rights reserved.</div>
       <div class="cl2"><a href="tel:+919950006100">📞 +91-9950006100</a><a
           href="mailto:prem.sagar.sharma68@gmail.com">✉️ prem.sagar.sharma68@gmail.com</a></div>
-      <p class="foot">Estimates for illustration only · not financial advice · all maths runs in your browser</p>
+      <p class="foot" id="ft-disc">Estimates for illustration only · not financial advice · all maths runs in your browser</p>
     </footer>
   </div>
   <script>
     const $ = s => document.querySelector(s), C = 2 * Math.PI * 54;
     const CURS = [['INR', '₹', 'en-IN'], ['USD', '$', 'en-US'], ['EUR', '€', 'en-IE'], ['AED', 'AED ', 'en-US']];
-    let ci = 0, S = '₹', L = 'en-IN', last = null, pts = [];
-    const f = n => S + Math.round(n).toLocaleString(L), sh = n => new Intl.NumberFormat(L, { notation: 'compact', maximumFractionDigits: 1 }).format(n);
+    let ci = 0, S = '₹', L = 'en-IN', last = null, pts = [], curLang = localStorage.getItem('finverse_lang') || 'en';
+
+    const I18N = {
+      en: {
+        pageTitle: 'Finverse · Smart Money Calculators',
+        heroTitle: 'Money maths,<br><span class="gt">made magical.</span>',
+        heroSub: 'Seven calculators for investing, saving, borrowing and lending, plus a plain-English guide to every live LIC insurance plan. Drag a slider and watch the numbers come alive.',
+        currencyLabel: 'Currency',
+        themeLabel: 'Toggle theme',
+        langLabel: 'Language',
+        ftCopy: '© 2026 Prem Sagar Sharma. All rights reserved.',
+        ftDisc: 'Estimates for illustration only · not financial advice · all maths runs in your browser',
+        calcSuffix: ' Calculator',
+        planWord: 'Plan',
+        yearsUnit: 'yrs',
+        yearTip: 'Year',
+        yrSuffix: 'y',
+        allPlans: 'All plans',
+        livePlans: 'live plans',
+        categories: 'categories',
+        checkedDate: 'Checked Oct 2026',
+        searchPlans: 'Search a plan, e.g. Jeevan, child, pension',
+        insHead: 'LIC plans, in plain words',
+        insSub: 'Every plan currently listed on LIC’s official site, grouped by what it does for you. Tap a goal to filter.',
+        calcBtn: '🧮 Calculate what you get',
+        noPlans: 'No plans match that search.',
+        insSrc: "Source: LIC of India official website (<a href='https://originlic.licindia.in/insurance-plan' target='_blank' rel='noopener'>licindia.in</a>), plan pages updated between Jan and Oct 2026. Riders, group, GIFT City and withdrawn plans are not listed. Descriptions are simplified; confirm benefits, eligibility and premiums with LIC before buying.",
+        modalSub: 'Change the numbers and see what you could get.',
+        modalNoteSuffix: ' Illustration only, not an LIC quote.',
+        closeLabel: 'Close',
+        mTermMain: 'Cover for your family',
+        mEstYrPrem: 'Est. yearly premium',
+        mTotPrem: 'Total premium over term',
+        mCovPer: 'Cover per ',
+        mCovPerSuf: ' of yearly premium',
+        mIncMain: 'Yearly income you can count on',
+        mIncStartAge: 'Income starts at age',
+        mIncYears: 'Years of income',
+        mIncTot100: 'Total income to age 100',
+        mAnnMain: 'Pension every year',
+        mAnnPerMo: 'Per month',
+        mAnnYearsBack: 'Years to earn back your money',
+        mDefannMain: 'Pension every year after waiting',
+        mDefannFund: 'Fund when pension starts',
+        mDefannYrsWait: 'Years before pension starts',
+        mUlipMain: 'Estimated fund value',
+        mUlipTotInv: 'Total invested',
+        mUlipGrowth: 'Est. growth',
+        mUlipPen6: 'Pension per year at 6% annuity',
+        mUlipMinCov: 'Min. cover (approx.)',
+        mCovMain: 'Cover you choose',
+        mSavMain: 'Estimated amount you get',
+        mSavTotPay: 'Total you pay',
+        mSavGain: 'Est. gain',
+        mSavLife125: 'Life cover (approx. 125%)',
+        mSavLife10x: 'Life cover (approx. 10×)',
+        mTermNote: 'Pays only if the insured person passes away during the term; nothing is paid at the end. The premium is a rough guess: your real price depends on health, smoking and gender.',
+        mIncNote: (pc) => `Income is ${pc}% of the sum assured each year after the premium term. The sum assured (plus any bonus) is also paid at the end. Your premium depends on your age, so ask LIC for a quote.`,
+        mAnnNote: 'Annuity rates change with your age, pension option and LIC’s current rates. Edit the rate to match your quote.',
+        mDefannNote: 'Both rates are assumptions. Edit them to match your LIC quote.',
+        mUlipNote: 'Market-linked: returns are not guaranteed and can be lower or even negative. We subtract 1.5% a year for assumed charges.',
+        mCovNote: 'The actual benefit depends on the option, waiting period and conditions in LIC’s policy document. Ask LIC for exact terms.',
+        mSavNote: 'Estimate using a steady yearly return that you can edit. Real payouts include LIC bonuses and guaranteed additions that vary, and money-back plans pay in instalments.'
+      },
+      hi: {
+        pageTitle: 'Finverse · स्मार्ट मनी कैलकुलेटर',
+        heroTitle: 'पैसों का हिसाब,<br><span class="gt">अब आसान और जादुई।</span>',
+        heroSub: 'निवेश, बचत, लोन और ब्याज के 7 स्मार्ट कैलकुलेटर तथा सभी चालू एलआईसी (LIC) बीमा योजनाओं की सरल मार्गदर्शिका। स्लाइडर घुमाएं और लाइव परिणाम देखें।',
+        currencyLabel: 'मुद्रा',
+        themeLabel: 'थीम बदलें',
+        langLabel: 'भाषा',
+        ftCopy: '© 2026 प्रेम सागर शर्मा। सर्वाधिकार सुरक्षित।',
+        ftDisc: 'आंकड़े केवल उदाहरण और समझ के लिए हैं · कोई वित्तीय सलाह नहीं · सभी गणनाएं आपके ब्राउज़र में होती हैं',
+        calcSuffix: ' कैलकुलेटर',
+        planWord: 'प्लान',
+        yearsUnit: 'वर्ष',
+        yearTip: 'वर्ष',
+        yrSuffix: ' वर्ष',
+        allPlans: 'सभी योजनाएं',
+        livePlans: 'चालू योजनाएं',
+        categories: 'श्रेणियां',
+        checkedDate: 'सत्यापित अक्टूबर 2026',
+        searchPlans: 'योजना खोजें, जैसे जीवन, बालक, पेंशन...',
+        insHead: 'एलआईसी योजनाएं, सरल शब्दों में',
+        insSub: 'एलआईसी की आधिकारिक वेबसाइट पर उपलब्ध सभी चालू योजनाएं, उनके लाभ व उद्देश्य के आधार पर। फ़िल्टर करने के लिए श्रेणी चुनें।',
+        calcBtn: '🧮 अनुमानित लाभ देखें',
+        noPlans: 'इस खोज से कोई योजना नहीं मिली।',
+        insSrc: "स्रोत: भारतीय जीवन बीमा निगम (LIC) आधिकारिक वेबसाइट (<a href='https://originlic.licindia.in/insurance-plan' target='_blank' rel='noopener'>licindia.in</a>), जनवरी से अक्टूबर 2026 तक अद्यतित। राइडर, ग्रुप, गिफ्ट सिटी व बंद योजनाएं शामिल नहीं हैं। विवरण सरल किए गए हैं; खरीदने से पहले एलआईसी से शर्तों व प्रीमियम की पुष्टि करें।",
+        modalSub: 'संख्याएं बदलें और देखें कि आपको क्या मिल सकता है।',
+        modalNoteSuffix: ' केवल उदाहरण के लिए, आधिकारिक एलआईसी कोटेशन नहीं।',
+        closeLabel: 'बंद करें',
+        mTermMain: 'परिवार के लिए जीवन सुरक्षा कवर',
+        mEstYrPrem: 'अनुमानित वार्षिक प्रीमियम',
+        mTotPrem: 'कुल पॉलिसी प्रीमियम',
+        mCovPer: 'कवर प्रति ',
+        mCovPerSuf: ' वार्षिक प्रीमियम',
+        mIncMain: 'नियमित वार्षिक गारंटीड आय',
+        mIncStartAge: 'आय शुरू होने की उम्र',
+        mIncYears: 'आय की कुल अवधि',
+        mIncTot100: '100 वर्ष की आयु तक कुल आय',
+        mAnnMain: 'प्रति वर्ष आजीवन पेंशन',
+        mAnnPerMo: 'प्रति माह पेंशन',
+        mAnnYearsBack: 'पूंजी वापस मिलने की अवधि',
+        mDefannMain: 'प्रतीक्षा अवधि बाद वार्षिक पेंशन',
+        mDefannFund: 'पेंशन शुरुआत पर कुल फंड',
+        mDefannYrsWait: 'पेंशन से पहले प्रतीक्षा वर्ष',
+        mUlipMain: 'अनुमानित फंड मूल्य',
+        mUlipTotInv: 'कुल निवेश',
+        mUlipGrowth: 'अनुमानित वृद्धि',
+        mUlipPen6: '6% वार्षिकी पर वार्षिक पेंशन',
+        mUlipMinCov: 'न्यूनतम कवर (लगभग)',
+        mCovMain: 'चुना गया बीमा कवर',
+        mSavMain: 'अनुमानित परिपक्वता राशि',
+        mSavTotPay: 'कुल जमा प्रीमियम',
+        mSavGain: 'अनुमानित कुल लाभ',
+        mSavLife125: 'जीवन सुरक्षा (लगभग 125%)',
+        mSavLife10x: 'जीवन सुरक्षा (लगभग 10 गुना)',
+        mTermNote: 'केवल पॉलिसी अवधि में बीमित व्यक्ति के निधन पर नॉमिनी को भुगतान मिलता है; पॉलिसी खत्म होने पर कोई रिटर्न नहीं होता। प्रीमियम अनुमानित है: वास्तविक प्रीमियम स्वास्थ्य, धूम्रपान और आयु पर निर्भर करता है।',
+        mIncNote: (pc) => `प्रीमियम भुगतान अवधि के बाद हर वर्ष बीमा राशि का ${pc}% नियमित आय के रूप में मिलता है। अंत में पूरी बीमा राशि (बोनस सहित) भी मिलती है।`,
+        mAnnNote: 'वार्षिकी दरें आपकी आयु, चुने गए पेंशन विकल्प और एलआईसी की वर्तमान दरों पर आधारित हैं। अपने कोटेशन के अनुसार दर समायोजित करें।',
+        mDefannNote: 'दोनों दरें अनुमानित हैं। अपने एलआईसी कोटेशन के अनुसार इन्हें समायोजित करें।',
+        mUlipNote: 'मार्केट-लिंक्ड (यूलिप): रिटर्न की गारंटी नहीं है और यह बाजार के उतार-चढ़ाव पर निर्भर है। हमने 1.5% वार्षिक अनुमानित शुल्क घटाया है।',
+        mCovNote: 'वास्तविक लाभ पॉलिसी के नियमों, प्रतीक्षा अवधि और शर्तों पर निर्भर करता है। सटीक विवरण के लिए एलआईसी दस्तावेज देखें।',
+        mSavNote: 'यह एक स्थिर वार्षिक रिटर्न पर आधारित अनुमान है। वास्तविक रिटर्न में एलआईसी बोनस और गारंटीड एडिशन शामिल होते हैं जो भिन्न हो सकते हैं।'
+      }
+    };
+
+    const numLocale = () => curLang == 'hi' ? 'hi-IN' : L;
+    const f = n => S + Math.round(n).toLocaleString(numLocale());
+    const sh = n => new Intl.NumberFormat(numLocale(), { notation: 'compact', maximumFractionDigits: 1 }).format(n);
     const rdFV = (p, r, m) => { let s = 0; for (let k = 1; k <= m; k++)s += p * Math.pow(1 + r / 400, 4 * (m - k + 1) / 12); return s };
+
     const CALCS = [
       {
-        n: 'SIP', ic: '📈', d: 'Build wealth with disciplined monthly investing.',
-        F: [{ k: 'p', l: 'Monthly investment', min: 500, max: 200000, st: 500, v: 25000, u: 'c' }, { k: 'r', l: 'Expected return (p.a.)', min: 1, max: 30, st: .1, v: 12, u: '%' }, { k: 'y', l: 'Time period', min: 1, max: 40, st: 1, v: 10, u: 'yrs' }, { k: 's', l: 'Annual step-up', min: 0, max: 25, st: 1, v: 0, u: '%' }],
+        n: { en: 'SIP', hi: 'एसआईपी (SIP)' }, ic: '📈',
+        d: { en: 'Build wealth with disciplined monthly investing.', hi: 'नियमित मासिक निवेश के साथ अनुशासित संपत्ति बनाएं।' },
+        F: [
+          { k: 'p', l: { en: 'Monthly investment', hi: 'मासिक निवेश' }, min: 500, max: 200000, st: 500, v: 25000, u: 'c' },
+          { k: 'r', l: { en: 'Expected return (p.a.)', hi: 'अपेक्षित रिटर्न (वार्षिक)' }, min: 1, max: 30, st: .1, v: 12, u: '%' },
+          { k: 'y', l: { en: 'Time period', hi: 'समय अवधि' }, min: 1, max: 40, st: 1, v: 10, u: 'yrs' },
+          { k: 's', l: { en: 'Annual step-up', hi: 'वार्षिक बढ़ोतरी (Step-up)' }, min: 0, max: 25, st: 1, v: 0, u: '%' }
+        ],
         run(v) {
-          let i = v.r / 1200, b = 0, inv = 0, c = v.p, ser = [{ x: 0, a: 0, b: 0 }]; for (let m = 1; m <= v.y * 12; m++) { b = (b + c) * (1 + i); inv += c; if (m % 12 == 0) { ser.push({ x: m / 12, a: inv, b }); c *= 1 + v.s / 100 } }
-          return { main: ['Future value', b], st: [['Invested', inv], ['Est. returns', b - inv], ['Wealth gain', inv ? (b - inv) / inv * 100 : 0, 1]], a: inv, g: b - inv, la: 'Invested', lg: 'Returns', ser, l1: 'Invested', l2: 'Value' }
+          const t = curLang == 'hi';
+          let i = v.r / 1200, b = 0, inv = 0, c = v.p, ser = [{ x: 0, a: 0, b: 0 }];
+          for (let m = 1; m <= v.y * 12; m++) { b = (b + c) * (1 + i); inv += c; if (m % 12 == 0) { ser.push({ x: m / 12, a: inv, b }); c *= 1 + v.s / 100 } }
+          return {
+            main: [t ? 'भविष्य का मूल्य' : 'Future value', b],
+            st: [
+              [t ? 'कुल निवेश' : 'Invested', inv],
+              [t ? 'अनुमानित रिटर्न' : 'Est. returns', b - inv],
+              [t ? 'कुल लाभ' : 'Wealth gain', inv ? (b - inv) / inv * 100 : 0, 1]
+            ],
+            a: inv, g: b - inv,
+            la: t ? 'कुल निवेश' : 'Invested',
+            lg: t ? 'अनुमानित रिटर्न' : 'Returns',
+            ser,
+            l1: t ? 'कुल निवेश' : 'Invested',
+            l2: t ? 'कुल मूल्य' : 'Value'
+          };
         }
       },
       {
-        n: 'Lumpsum', ic: '💎', d: 'See what a one-time investment can become.',
-        F: [{ k: 'p', l: 'Total investment', min: 10000, max: 10000000, st: 10000, v: 500000, u: 'c' }, { k: 'r', l: 'Expected return (p.a.)', min: 1, max: 30, st: .1, v: 12, u: '%' }, { k: 'y', l: 'Time period', min: 1, max: 40, st: 1, v: 10, u: 'yrs' }],
-        run(v) { const g = t => v.p * Math.pow(1 + v.r / 100, t), fv = g(v.y); return { main: ['Maturity value', fv], st: [['Invested', v.p], ['Est. returns', fv - v.p], ['Multiple', fv / v.p, 2]], a: v.p, g: fv - v.p, la: 'Invested', lg: 'Returns', ser: Array.from({ length: v.y + 1 }, (_, t) => ({ x: t, a: v.p, b: g(t) })), l1: 'Invested', l2: 'Value' } }
+        n: { en: 'Lumpsum', hi: 'एकमुश्त (Lumpsum)' }, ic: '💎',
+        d: { en: 'See what a one-time investment can become.', hi: 'देखें कि एक बार का निवेश समय के साथ कितना बढ़ सकता है।' },
+        F: [
+          { k: 'p', l: { en: 'Total investment', hi: 'कुल निवेश' }, min: 10000, max: 10000000, st: 10000, v: 500000, u: 'c' },
+          { k: 'r', l: { en: 'Expected return (p.a.)', hi: 'अपेक्षित रिटर्न (वार्षिक)' }, min: 1, max: 30, st: .1, v: 12, u: '%' },
+          { k: 'y', l: { en: 'Time period', hi: 'समय अवधि' }, min: 1, max: 40, st: 1, v: 10, u: 'yrs' }
+        ],
+        run(v) {
+          const t = curLang == 'hi', g = time => v.p * Math.pow(1 + v.r / 100, time), fv = g(v.y);
+          return {
+            main: [t ? 'मैच्योरिटी राशि' : 'Maturity value', fv],
+            st: [
+              [t ? 'कुल निवेश' : 'Invested', v.p],
+              [t ? 'अनुमानित रिटर्न' : 'Est. returns', fv - v.p],
+              [t ? 'वृद्धि अनुपात' : 'Multiple', fv / v.p, 2]
+            ],
+            a: v.p, g: fv - v.p,
+            la: t ? 'कुल निवेश' : 'Invested',
+            lg: t ? 'अनुमानित रिटर्न' : 'Returns',
+            ser: Array.from({ length: v.y + 1 }, (_, time) => ({ x: time, a: v.p, b: g(time) })),
+            l1: t ? 'कुल निवेश' : 'Invested',
+            l2: t ? 'कुल मूल्य' : 'Value'
+          };
+        }
       },
       {
-        n: 'Loan EMI', ic: '🏠', d: 'Home, car or personal loan, your monthly EMI at a glance.',
-        F: [{ k: 'p', l: 'Loan amount', min: 100000, max: 50000000, st: 50000, v: 2500000, u: 'c' }, { k: 'r', l: 'Interest rate (p.a.)', min: 1, max: 20, st: .05, v: 8.5, u: '%' }, { k: 'y', l: 'Loan tenure', min: 1, max: 30, st: 1, v: 20, u: 'yrs' }],
+        n: { en: 'Loan EMI', hi: 'लोन ईएमआई (EMI)' }, ic: '🏠',
+        d: { en: 'Home, car or personal loan, your monthly EMI at a glance.', hi: 'होम, कार या पर्सनल लोन - अपनी मासिक ईएमआई तुरंत जानें।' },
+        F: [
+          { k: 'p', l: { en: 'Loan amount', hi: 'लोन राशि' }, min: 100000, max: 50000000, st: 50000, v: 2500000, u: 'c' },
+          { k: 'r', l: { en: 'Interest rate (p.a.)', hi: 'ब्याज दर (वार्षिक)' }, min: 1, max: 20, st: .05, v: 8.5, u: '%' },
+          { k: 'y', l: { en: 'Loan tenure', hi: 'लोन अवधि' }, min: 1, max: 30, st: 1, v: 20, u: 'yrs' }
+        ],
         run(v) {
-          const i = v.r / 1200, m = v.y * 12, E = i ? v.p * i * Math.pow(1 + i, m) / (Math.pow(1 + i, m) - 1) : v.p / m, tot = E * m; let bal = v.p; const ser = [{ x: 0, a: 0, b: bal }];
+          const t = curLang == 'hi', i = v.r / 1200, m = v.y * 12,
+            E = i ? v.p * i * Math.pow(1 + i, m) / (Math.pow(1 + i, m) - 1) : v.p / m,
+            tot = E * m;
+          let bal = v.p; const ser = [{ x: 0, a: 0, b: bal }];
           for (let k = 1; k <= m; k++) { bal -= E - bal * i; if (k % 12 == 0) ser.push({ x: k / 12, a: E * k, b: Math.max(0, bal) }) }
-          return { main: ['Monthly EMI', E], st: [['Principal', v.p], ['Total interest', tot - v.p], ['Total payment', tot]], a: v.p, g: tot - v.p, la: 'Principal', lg: 'Interest', ser, l1: 'Paid so far', l2: 'Balance' }
+          return {
+            main: [t ? 'मासिक ईएमआई' : 'Monthly EMI', E],
+            st: [
+              [t ? 'मूलधन' : 'Principal', v.p],
+              [t ? 'कुल ब्याज' : 'Total interest', tot - v.p],
+              [t ? 'कुल भुगतान' : 'Total payment', tot]
+            ],
+            a: v.p, g: tot - v.p,
+            la: t ? 'मूलधन' : 'Principal',
+            lg: t ? 'कुल ब्याज' : 'Interest',
+            ser,
+            l1: t ? 'चुकाया गया' : 'Paid so far',
+            l2: t ? 'शेष लोन' : 'Balance'
+          };
         }
       },
       {
-        n: 'RD', ic: '🏦', d: 'Recurring deposit with quarterly compounding.',
-        F: [{ k: 'p', l: 'Monthly deposit', min: 500, max: 100000, st: 500, v: 10000, u: 'c' }, { k: 'r', l: 'Interest rate (p.a.)', min: 1, max: 12, st: .1, v: 6.5, u: '%' }, { k: 'y', l: 'Time period', min: 1, max: 10, st: 1, v: 5, u: 'yrs' }],
-        run(v) { const fv = rdFV(v.p, v.r, v.y * 12), inv = v.p * v.y * 12; return { main: ['Maturity amount', fv], st: [['Total deposited', inv], ['Interest earned', fv - inv], ['Effective yield', inv ? (fv - inv) / inv * 100 : 0, 1]], a: inv, g: fv - inv, la: 'Deposited', lg: 'Interest', ser: Array.from({ length: v.y + 1 }, (_, t) => ({ x: t, a: v.p * 12 * t, b: rdFV(v.p, v.r, t * 12) })), l1: 'Deposited', l2: 'Value' } }
+        n: { en: 'RD', hi: 'आरडी (RD)' }, ic: '🏦',
+        d: { en: 'Recurring deposit with quarterly compounding.', hi: 'तिमाही चक्रवृद्धि ब्याज के साथ रिकरिंग डिपॉजिट।' },
+        F: [
+          { k: 'p', l: { en: 'Monthly deposit', hi: 'मासिक जमा' }, min: 500, max: 100000, st: 500, v: 10000, u: 'c' },
+          { k: 'r', l: { en: 'Interest rate (p.a.)', hi: 'ब्याज दर (वार्षिक)' }, min: 1, max: 12, st: .1, v: 6.5, u: '%' },
+          { k: 'y', l: { en: 'Time period', hi: 'समय अवधि' }, min: 1, max: 10, st: 1, v: 5, u: 'yrs' }
+        ],
+        run(v) {
+          const t = curLang == 'hi', fv = rdFV(v.p, v.r, v.y * 12), inv = v.p * v.y * 12;
+          return {
+            main: [t ? 'मैच्योरिटी राशि' : 'Maturity amount', fv],
+            st: [
+              [t ? 'कुल जमा' : 'Total deposited', inv],
+              [t ? 'अर्जित ब्याज' : 'Interest earned', fv - inv],
+              [t ? 'प्रभावी यील्ड' : 'Effective yield', inv ? (fv - inv) / inv * 100 : 0, 1]
+            ],
+            a: inv, g: fv - inv,
+            la: t ? 'कुल जमा' : 'Deposited',
+            lg: t ? 'अर्जित ब्याज' : 'Interest',
+            ser: Array.from({ length: v.y + 1 }, (_, time) => ({ x: time, a: v.p * 12 * time, b: rdFV(v.p, v.r, time * 12) })),
+            l1: t ? 'कुल जमा' : 'Deposited',
+            l2: t ? 'कुल मूल्य' : 'Value'
+          };
+        }
       },
       {
-        n: 'FD', ic: '🔒', d: 'Fixed deposit maturity with your choice of compounding.',
-        F: [{ k: 'p', l: 'Deposit amount', min: 10000, max: 10000000, st: 10000, v: 500000, u: 'c' }, { k: 'r', l: 'Interest rate (p.a.)', min: 1, max: 12, st: .1, v: 7, u: '%' }, { k: 'y', l: 'Time period', min: 1, max: 25, st: 1, v: 5, u: 'yrs' }, { k: 'q', l: 'Compounding', seg: ['Monthly', 'Quarterly', 'Yearly'], vals: [12, 4, 1], v: 1 }],
-        run(v) { const g = t => v.p * Math.pow(1 + v.r / (100 * v.q), v.q * t), fv = g(v.y); return { main: ['Maturity amount', fv], st: [['Deposited', v.p], ['Interest earned', fv - v.p], ['Total growth', (fv - v.p) / v.p * 100, 1]], a: v.p, g: fv - v.p, la: 'Deposited', lg: 'Interest', ser: Array.from({ length: v.y + 1 }, (_, t) => ({ x: t, a: v.p, b: g(t) })), l1: 'Deposited', l2: 'Value' } }
+        n: { en: 'FD', hi: 'एफडी (FD)' }, ic: '🔒',
+        d: { en: 'Fixed deposit maturity with your choice of compounding.', hi: 'अपनी पसंद के चक्रवृद्धि (Compounding) विकल्प के साथ फिक्स्ड डिपॉजिट।' },
+        F: [
+          { k: 'p', l: { en: 'Deposit amount', hi: 'जमा राशि' }, min: 10000, max: 10000000, st: 10000, v: 500000, u: 'c' },
+          { k: 'r', l: { en: 'Interest rate (p.a.)', hi: 'ब्याज दर (वार्षिक)' }, min: 1, max: 12, st: .1, v: 7, u: '%' },
+          { k: 'y', l: { en: 'Time period', hi: 'समय अवधि' }, min: 1, max: 25, st: 1, v: 5, u: 'yrs' },
+          {
+            k: 'q', l: { en: 'Compounding', hi: 'कम्पाउंडिंग चक्र' },
+            seg: { en: ['Monthly', 'Quarterly', 'Yearly'], hi: ['मासिक', 'तिमाही', 'वार्षिक'] },
+            vals: [12, 4, 1], v: 1
+          }
+        ],
+        run(v) {
+          const t = curLang == 'hi', g = time => v.p * Math.pow(1 + v.r / (100 * v.q), v.q * time), fv = g(v.y);
+          return {
+            main: [t ? 'मैच्योरिटी राशि' : 'Maturity amount', fv],
+            st: [
+              [t ? 'कुल जमा' : 'Deposited', v.p],
+              [t ? 'अर्जित ब्याज' : 'Interest earned', fv - v.p],
+              [t ? 'कुल वृद्धि' : 'Total growth', (fv - v.p) / v.p * 100, 1]
+            ],
+            a: v.p, g: fv - v.p,
+            la: t ? 'कुल जमा' : 'Deposited',
+            lg: t ? 'अर्जित ब्याज' : 'Interest',
+            ser: Array.from({ length: v.y + 1 }, (_, time) => ({ x: time, a: v.p, b: g(time) })),
+            l1: t ? 'कुल जमा' : 'Deposited',
+            l2: t ? 'कुल मूल्य' : 'Value'
+          };
+        }
       },
       {
-        n: 'Lend Money', ic: '🤝', d: 'Interest earned when you lend, simple or compounded monthly.',
-        F: [{ k: 'p', l: 'Amount lent', min: 1000, max: 10000000, st: 1000, v: 100000, u: 'c' }, { k: 'r', l: 'Interest rate (p.a.)', min: .5, max: 60, st: .5, v: 18, u: '%' }, { k: 'y', l: 'Duration', min: .5, max: 20, st: .5, v: 3, u: 'yrs' }, { k: 'm', l: 'Interest type', seg: ['Simple', 'Compound'], vals: [0, 1], v: 0 }],
-        run(v) { const g = t => v.m ? v.p * Math.pow(1 + v.r / 1200, 12 * t) : v.p * (1 + v.r * t / 100), tot = g(v.y); return { main: ['Total to receive', tot], st: [['Principal', v.p], ['Interest earned', tot - v.p], ['Avg. per month', (tot - v.p) / (v.y * 12)]], a: v.p, g: tot - v.p, la: 'Principal', lg: 'Interest', ser: Array.from({ length: 11 }, (_, j) => ({ x: v.y * j / 10, a: v.p, b: g(v.y * j / 10) })), l1: 'Principal', l2: 'Amount' } }
+        n: { en: 'Lend Money', hi: 'उधार ब्याज' }, ic: '🤝',
+        d: { en: 'Interest earned when you lend, simple or compounded monthly.', hi: 'उधार दिए गए पैसों पर साधारण या मासिक चक्रवृद्धि ब्याज की गणना।' },
+        F: [
+          { k: 'p', l: { en: 'Amount lent', hi: 'उधार दी गई राशि' }, min: 1000, max: 10000000, st: 1000, v: 100000, u: 'c' },
+          { k: 'r', l: { en: 'Interest rate (p.a.)', hi: 'ब्याज दर (वार्षिक)' }, min: .5, max: 60, st: .5, v: 18, u: '%' },
+          { k: 'y', l: { en: 'Duration', hi: 'समय अवधि' }, min: .5, max: 20, st: .5, v: 3, u: 'yrs' },
+          {
+            k: 'm', l: { en: 'Interest type', hi: 'ब्याज का प्रकार' },
+            seg: { en: ['Simple', 'Compound'], hi: ['साधारण', 'चक्रवृद्धि'] },
+            vals: [0, 1], v: 0
+          }
+        ],
+        run(v) {
+          const t = curLang == 'hi', g = time => v.m ? v.p * Math.pow(1 + v.r / 1200, 12 * time) : v.p * (1 + v.r * time / 100), tot = g(v.y);
+          return {
+            main: [t ? 'कुल प्राप्त राशि' : 'Total to receive', tot],
+            st: [
+              [t ? 'मूलधन' : 'Principal', v.p],
+              [t ? 'अर्जित ब्याज' : 'Interest earned', tot - v.p],
+              [t ? 'औसत प्रति माह' : 'Avg. per month', (tot - v.p) / (v.y * 12)]
+            ],
+            a: v.p, g: tot - v.p,
+            la: t ? 'मूलधन' : 'Principal',
+            lg: t ? 'अर्जित ब्याज' : 'Interest',
+            ser: Array.from({ length: 11 }, (_, j) => ({ x: v.y * j / 10, a: v.p, b: g(v.y * j / 10) })),
+            l1: t ? 'मूलधन' : 'Principal',
+            l2: t ? 'कुल राशि' : 'Amount'
+          };
+        }
       },
       {
-        n: 'CAGR', ic: '🚀', d: 'Find the annual growth rate between two values.',
-        F: [{ k: 'i', l: 'Initial value', min: 1000, max: 10000000, st: 1000, v: 100000, u: 'c' }, { k: 'e', l: 'Final value', min: 1000, max: 100000000, st: 1000, v: 250000, u: 'c' }, { k: 'y', l: 'Time period', min: 1, max: 40, st: 1, v: 5, u: 'yrs' }],
-        run(v) { const c = Math.pow(v.e / v.i, 1 / v.y) - 1; return { main: ['CAGR', c * 100, 1], st: [['Initial', v.i], ['Final', v.e], ['Absolute return', (v.e - v.i) / v.i * 100, 1]], a: v.i, g: Math.max(0, v.e - v.i), la: 'Initial', lg: 'Growth', ser: Array.from({ length: v.y + 1 }, (_, t) => ({ x: t, a: v.i, b: v.i * Math.pow(1 + c, t) })), l1: 'Initial', l2: 'Value' } }
+        n: { en: 'CAGR', hi: 'सीएजीआर (CAGR)' }, ic: '🚀',
+        d: { en: 'Find the annual growth rate between two values.', hi: 'दो मूल्यों के बीच वार्षिक चक्रवृद्धि वृद्धि दर (CAGR) जानें।' },
+        F: [
+          { k: 'i', l: { en: 'Initial value', hi: 'प्रारंभिक मूल्य' }, min: 1000, max: 10000000, st: 1000, v: 100000, u: 'c' },
+          { k: 'e', l: { en: 'Final value', hi: 'अंतिम मूल्य' }, min: 1000, max: 100000000, st: 1000, v: 250000, u: 'c' },
+          { k: 'y', l: { en: 'Time period', hi: 'समय अवधि' }, min: 1, max: 40, st: 1, v: 5, u: 'yrs' }
+        ],
+        run(v) {
+          const t = curLang == 'hi', c = Math.pow(v.e / v.i, 1 / v.y) - 1;
+          return {
+            main: [t ? 'सीएजीआर (CAGR)' : 'CAGR', c * 100, 1],
+            st: [
+              [t ? 'प्रारंभिक' : 'Initial', v.i],
+              [t ? 'अंतिम' : 'Final', v.e],
+              [t ? 'कुल रिटर्न' : 'Absolute return', (v.e - v.i) / v.i * 100, 1]
+            ],
+            a: v.i, g: Math.max(0, v.e - v.i),
+            la: t ? 'प्रारंभिक' : 'Initial',
+            lg: t ? 'कुल वृद्धि' : 'Growth',
+            ser: Array.from({ length: v.y + 1 }, (_, time) => ({ x: time, a: v.i, b: v.i * Math.pow(1 + c, time) })),
+            l1: t ? 'प्रारंभिक' : 'Initial',
+            l2: t ? 'कुल मूल्य' : 'Value'
+          };
+        }
       },
-      { n: 'Insurance', ic: '🛡️', ins: 1, d: '', F: [] }
+      { n: { en: 'Insurance', hi: 'बीमा योजनाएं (LIC)' }, ic: '🛡️', ins: 1, d: { en: '', hi: '' }, F: [] }
     ];
-    const CATS = [['term', 'Protect my family', '🛡️', '#ff5fa2', 'Term Assurance', 'No maturity payout'], ['endow', 'Save for a goal', '🎯', '#8b7bff', 'Endowment', 'Non-linked savings'], ['mb', 'Regular payouts', '💸', '#f5a524', 'Money Back', 'Non-linked payouts'], ['wl', 'Lifelong cover', '♾️', '#14b8a6', 'Whole Life', 'Cover for life'], ['pen', 'Retirement income', '🌅', '#ff8a3d', 'Pension', 'Lifetime income'], ['ulip', 'Grow with the market', '📊', '#3d9bff', 'Unit Linked', 'Market risk'], ['hl', 'Health cover', '🩺', '#ef4565', 'Health Insurance', 'Health benefits'], ['mi', 'Small budget', '🌱', '#65b82e', 'Micro Insurance', 'Low cost']], CAT = Object.fromEntries(CATS.map(c => [c[0], c]));
+
+    const CATS = [
+      ['term', 'Protect my family', 'परिवार की सुरक्षा', '🛡️', '#ff5fa2', 'Term Assurance', 'टर्म इंश्योरेंस', 'No maturity payout', 'मैच्योरिटी भुगतान नहीं'],
+      ['endow', 'Save for a goal', 'लक्ष्य के लिए बचत', '🎯', '#8b7bff', 'Endowment', 'एंडोमेंट', 'Non-linked savings', 'सुरक्षित बचत'],
+      ['mb', 'Regular payouts', 'नियमित रिटर्न', '💸', '#f5a524', 'Money Back', 'मनी बैक', 'Non-linked payouts', 'गारंटीड रिटर्न'],
+      ['wl', 'Lifelong cover', 'आजीवन सुरक्षा', '♾️', '#14b8a6', 'Whole Life', 'होल लाइफ', 'Cover for life', 'जीवन भर सुरक्षा'],
+      ['pen', 'Retirement income', 'पेंशन / रिटायरमेंट', '🌅', '#ff8a3d', 'Pension', 'पेंशन योजना', 'Lifetime income', 'आजीवन आय'],
+      ['ulip', 'Grow with the market', 'मार्केट लिंक्ड', '📊', '#3d9bff', 'Unit Linked', 'यूलिप (ULIP)', 'Market risk', 'बाजार जोखिम'],
+      ['hl', 'Health cover', 'स्वास्थ्य सुरक्षा', '🩺', '#ef4565', 'Health Insurance', 'स्वास्थ्य बीमा', 'Health benefits', 'चिकित्सा लाभ'],
+      ['mi', 'Small budget', 'कम बजट', '🌱', '#65b82e', 'Micro Insurance', 'माइक्रो इंश्योरेंस', 'Low cost', 'किफायती']
+    ];
+    const CAT = Object.fromEntries(CATS.map(c => [c[0], c]));
+
     const INS = [
-      ['term', 'LIC’s Digi Term', 876, '512N356V02', 'Online-only pure term plan: low premium and big cover for your family.'],
-      ['term', 'LIC’s Yuva Term', 875, '512N355V02', 'Term plan made for young buyers: pure cover at a low cost.'],
-      ['term', 'LIC’s Digi Credit Life', 878, '512N358V01', 'Online cover that tracks your loan, so family is not left with the debt.'],
-      ['term', 'LIC’s Yuva Credit Life', 877, '512N357V01', 'Loan-linked cover designed for young borrowers.'],
-      ['term', 'LIC’s New Tech-Term', 954, '512N351V02', 'Online pure term plan with simple, low-cost life cover.'],
-      ['term', 'LIC’s New Jeevan Amar', 955, '512N350V02', 'Classic term plan: a lump sum goes to your family if you pass away during the term.'],
-      ['term', 'LIC’s Saral Jeevan Bima', 859, '512N341V01', 'Simple, standard term plan with easy-to-understand basic features.'],
-      ['term', 'LIC’s Bima Kavach', 887, '512N360V01', 'Term plan focused on pure protection for your family.'],
-      ['endow', 'LIC’s Single Premium Endowment Plan', 717, '512N283V03', 'Pay once, get life cover plus a lump sum at the end.'],
-      ['endow', 'LIC’s New Endowment Plan', 714, '512N277V03', 'Regular savings with life cover; lump sum plus bonuses at maturity.'],
-      ['endow', 'LIC’s New Jeevan Anand', 715, '512N279V03', 'Get a maturity lump sum, and life cover continues for life after that.'],
-      ['endow', 'LIC’s Jeevan Lakshya', 733, '512N297V03', 'Built around a child’s future goals, with support for family if the parent is gone.'],
-      ['endow', 'LIC’s Jeevan Labh', 736, '512N304V03', 'Limited-premium savings plan with bonuses at maturity.'],
-      ['endow', 'LIC’s Amritbaal', 774, '512N365V02', 'Savings plan built around a child’s future needs.'],
-      ['endow', 'LIC’s Bima Jyoti', 760, '512N339V03', 'Savings plan with guaranteed additions plus life cover.'],
-      ['endow', 'LIC’s Nav Jeevan Shree', 912, '512N387V02', 'Non-linked savings plan with life cover.'],
-      ['endow', 'LIC’s Bima Lakshmi', 881, '512N389V01', 'Non-linked savings plan with life cover.'],
-      ['mb', 'LIC’s Bima Shree', 748, '512N316V03', 'Money-back plan for larger covers, with guaranteed additions.'],
-      ['mb', 'LIC’s New Money Back Plan – 20 Years', 720, '512N280V03', 'Get payouts during the 20-year term and the rest at maturity.'],
-      ['mb', 'LIC’s New Money Back Plan – 25 Years', 721, '512N278V03', 'Same idea over 25 years: regular payouts, then the balance at maturity.'],
-      ['mb', 'LIC’s New Children’s Money Back Plan', 732, '512N296V03', 'Money back timed for key milestones in a child’s life, like education.'],
-      ['mb', 'LIC’s Jeevan Tarun', 734, '512N299V03', 'Child plan with payouts timed for the study years.'],
-      ['wl', 'LIC’s Jeevan Umang', 745, '512N312V03', 'Lifelong cover plus a yearly income once your premiums end.'],
-      ['wl', 'LIC’s Jeevan Utsav', 771, '512N363V02', 'Whole-life plan with guaranteed regular income.'],
-      ['pen', 'LIC’s New Pension Plus', 867, '512L347V01', 'Market-linked pension plan: grow a retirement fund over time.', 'Market risk'],
-      ['pen', 'LIC’s Jeevan Akshay-VII', 857, '512N337V07', 'Immediate annuity: pay once, start getting income for life.'],
-      ['pen', 'LIC’s New Jeevan Shanti', 758, '512N338V08', 'Deferred annuity: invest now, get a pension later.'],
-      ['pen', 'LIC’s Saral Pension', 862, '512N342V05', 'Simple immediate annuity for a lifelong pension.'],
-      ['pen', 'LIC’s Smart Pension', 879, '512N386V01', 'Annuity plan for steady retirement income.'],
-      ['ulip', 'LIC’s Index Plus', 873, '512L354V01', 'Market-linked plan combining fund growth with life cover.'],
-      ['ulip', 'LIC’s Nivesh Plus', 749, '512L317V02', 'Single-premium market-linked plan: invest once, let it grow.'],
-      ['ulip', 'LIC’s SIIP', 752, '512L334V02', 'Regular-premium market-linked plan with life cover.'],
-      ['ulip', 'LIC’s Protection Plus', 886, '512L361V01', 'Market-linked plan that leans towards higher life cover.'],
-      ['hl', 'LIC’s Health Shield', 907, '512N369V01', 'Health protection plan for medical needs.'],
-      ['hl', 'LIC’s New Cancer Cover', 908, '512N370V01', 'Financial support if you are diagnosed with cancer.'],
-      ['mi', 'LIC’s Micro Bachat', 751, '512N329V03', 'Tiny-premium savings plus cover for low incomes.'],
-      ['mi', 'LIC’s Jan Suraksha', 880, '512N388V01', 'Low-cost micro cover built for small budgets.']];
+      ['term', 'LIC’s Digi Term', 876, '512N356V02', 'Online-only pure term plan: low premium and big cover for your family.', 'केवल ऑनलाइन प्योर टर्म प्लान: कम प्रीमियम में परिवार के लिए बड़ा सुरक्षा कवर।'],
+      ['term', 'LIC’s Yuva Term', 875, '512N355V02', 'Term plan made for young buyers: pure cover at a low cost.', 'युवाओं के लिए विशेष टर्म प्लान: कम लागत में शुद्ध जीवन सुरक्षा।'],
+      ['term', 'LIC’s Digi Credit Life', 878, '512N358V01', 'Online cover that tracks your loan, so family is not left with the debt.', 'ऑनलाइन लोन सुरक्षा कवर, ताकि आपके न रहने पर परिवार पर कर्ज का बोझ न आए।'],
+      ['term', 'LIC’s Yuva Credit Life', 877, '512N357V01', 'Loan-linked cover designed for young borrowers.', 'युवा कर्जदारों के लिए तैयार किया गया लोन-लिंक्ड सुरक्षा प्लान।'],
+      ['term', 'LIC’s New Tech-Term', 954, '512N351V02', 'Online pure term plan with simple, low-cost life cover.', 'ऑनलाइन प्योर टर्म प्लान, सरल और किफायती जीवन सुरक्षा के साथ।'],
+      ['term', 'LIC’s New Jeevan Amar', 955, '512N350V02', 'Classic term plan: a lump sum goes to your family if you pass away during the term.', 'पारंपरिक टर्म प्लान: पॉलिसी अवधि में अनहोनी होने पर परिवार को एकमुश्त राशि।'],
+      ['term', 'LIC’s Saral Jeevan Bima', 859, '512N341V01', 'Simple, standard term plan with easy-to-understand basic features.', 'सरल व मानक टर्म प्लान, आसान और स्पष्ट बुनियादी शर्तों के साथ।'],
+      ['term', 'LIC’s Bima Kavach', 887, '512N360V01', 'Term plan focused on pure protection for your family.', 'परिवार की शुद्ध सुरक्षा और भविष्य पर केंद्रित टर्म प्लान।'],
+      ['endow', 'LIC’s Single Premium Endowment Plan', 717, '512N283V03', 'Pay once, get life cover plus a lump sum at the end.', 'एक बार प्रीमियम भरें, जीवन सुरक्षा के साथ मैच्योरिटी पर एकमुश्त राशि पाएं।'],
+      ['endow', 'LIC’s New Endowment Plan', 714, '512N277V03', 'Regular savings with life cover; lump sum plus bonuses at maturity.', 'नियमित बचत के साथ जीवन सुरक्षा; मैच्योरिटी पर बोनस सहित एकमुश्त भुगतान।'],
+      ['endow', 'LIC’s New Jeevan Anand', 715, '512N279V03', 'Get a maturity lump sum, and life cover continues for life after that.', 'मैच्योरिटी पर एकमुश्त राशि, और उसके बाद भी आजीवन जीवन सुरक्षा जारी।'],
+      ['endow', 'LIC’s Jeevan Lakshya', 733, '512N297V03', 'Built around a child’s future goals, with support for family if the parent is gone.', 'बच्चों के भविष्य और शिक्षा के लिए, माता-पिता के न रहने पर भी परिवार को निरंतर सहायता।'],
+      ['endow', 'LIC’s Jeevan Labh', 736, '512N304V03', 'Limited-premium savings plan with bonuses at maturity.', 'सीमित प्रीमियम भुगतान वाली बचत योजना, मैच्योरिटी पर आकर्षक बोनस के साथ।'],
+      ['endow', 'LIC’s Amritbaal', 774, '512N365V02', 'Savings plan built around a child’s future needs.', 'बच्चों की भविष्य की उच्च शिक्षा और जरूरतों के लिए विशेष बचत योजना।'],
+      ['endow', 'LIC’s Bima Jyoti', 760, '512N339V03', 'Savings plan with guaranteed additions plus life cover.', 'गारंटीड एडिशन (निश्चित लाभ) और जीवन सुरक्षा के साथ बचत योजना।'],
+      ['endow', 'LIC’s Nav Jeevan Shree', 912, '512N387V02', 'Non-linked savings plan with life cover.', 'सुरक्षित नॉन-लिंक्ड बचत योजना, जीवन सुरक्षा लाभ के साथ।'],
+      ['endow', 'LIC’s Bima Lakshmi', 881, '512N389V01', 'Non-linked savings plan with life cover.', 'महिलाओं व परिवारों के लिए नॉन-लिंक्ड बचत एवं सुरक्षा योजना।'],
+      ['mb', 'LIC’s Bima Shree', 748, '512N316V03', 'Money-back plan for larger covers, with guaranteed additions.', 'उच्च बीमा राशि के लिए मनी-बैक प्लान, गारंटीड एडिशन के साथ।'],
+      ['mb', 'LIC’s New Money Back Plan – 20 Years', 720, '512N280V03', 'Get payouts during the 20-year term and the rest at maturity.', '20 वर्षों की अवधि में समय-समय पर भुगतान और मैच्योरिटी पर शेष राशि।'],
+      ['mb', 'LIC’s New Money Back Plan – 25 Years', 721, '512N278V03', 'Same idea over 25 years: regular payouts, then the balance at maturity.', '25 वर्षों की अवधि में नियमित अंतरालों पर रिटर्न और मैच्योरिटी पर शेष लाभ।'],
+      ['mb', 'LIC’s New Children’s Money Back Plan', 732, '512N296V03', 'Money back timed for key milestones in a child’s life, like education.', 'बच्चे की शिक्षा और महत्वपूर्ण पड़ावों के समय किस्तों में मनी-बैक लाभ।'],
+      ['mb', 'LIC’s Jeevan Tarun', 734, '512N299V03', 'Child plan with payouts timed for the study years.', 'बच्चों की उच्च पढ़ाई के दौरान नियमित वित्तीय सहायता प्रदान करने वाला प्लान।'],
+      ['wl', 'LIC’s Jeevan Umang', 745, '512N312V03', 'Lifelong cover plus a yearly income once your premiums end.', 'आजीवन सुरक्षा और प्रीमियम खत्म होने के बाद 100 वर्ष की आयु तक हर साल गारंटीड आय।'],
+      ['wl', 'LIC’s Jeevan Utsav', 771, '512N363V02', 'Whole-life plan with guaranteed regular income.', 'संपूर्ण जीवन बीमा योजना, आजीवन गारंटीड नियमित आय के साथ।'],
+      ['pen', 'LIC’s New Pension Plus', 867, '512L347V01', 'Market-linked pension plan: grow a retirement fund over time.', 'मार्केट-लिंक्ड पेंशन प्लान: समय के साथ रिटायरमेंट के लिए बड़ा फंड तैयार करें।', 'Market risk', 'बाजार जोखिम'],
+      ['pen', 'LIC’s Jeevan Akshay-VII', 857, '512N337V07', 'Immediate annuity: pay once, start getting income for life.', 'तत्काल वार्षिकी: एक बार निवेश करें और तुरंत जीवन भर नियमित पेंशन पाएं।'],
+      ['pen', 'LIC’s New Jeevan Shanti', 758, '512N338V08', 'Deferred annuity: invest now, get a pension later.', 'डेफर्ड वार्षिकी: आज निवेश करें और कुछ वर्षों बाद से जीवन भर पेंशन पाएं।'],
+      ['pen', 'LIC’s Saral Pension', 862, '512N342V05', 'Simple immediate annuity for a lifelong pension.', 'सरल व स्पष्ट शर्तों वाली तत्काल पेंशन योजना, आजीवन आय के लिए।'],
+      ['pen', 'LIC’s Smart Pension', 879, '512N386V01', 'Annuity plan for steady retirement income.', 'स्थिर और सुरक्षित रिटायरमेंट आय के लिए वार्षिकी योजना।'],
+      ['ulip', 'LIC’s Index Plus', 873, '512L354V01', 'Market-linked plan combining fund growth with life cover.', 'इंडेक्स आधारित मार्केट-लिंक्ड प्लान, फंड ग्रोथ और लाइफ कवर दोनों।'],
+      ['ulip', 'LIC’s Nivesh Plus', 749, '512L317V02', 'Single-premium market-linked plan: invest once, let it grow.', 'सिंगल प्रीमियम यूलिप: एक बार निवेश करें और बाजार के साथ बढ़ने दें।'],
+      ['ulip', 'LIC’s SIIP', 752, '512L334V02', 'Regular-premium market-linked plan with life cover.', 'नियमित प्रीमियम वाला मार्केट-लिंक्ड प्लान, जीवन सुरक्षा के साथ।'],
+      ['ulip', 'LIC’s Protection Plus', 886, '512L361V01', 'Market-linked plan that leans towards higher life cover.', 'मार्केट-लिंक्ड प्लान, जो उच्च जीवन सुरक्षा और निवेश का संतुलन देता है।'],
+      ['hl', 'LIC’s Health Shield', 907, '512N369V01', 'Health protection plan for medical needs.', 'स्वास्थ्य सुरक्षा प्लान, गंभीर बीमारियों और चिकित्सकीय खर्चों से सुरक्षा।'],
+      ['hl', 'LIC’s New Cancer Cover', 908, '512N370V01', 'Financial support if you are diagnosed with cancer.', 'कैंसर के निदान पर वित्तीय सुरक्षा और उपचार के लिए एकमुश्त सहायता।'],
+      ['mi', 'LIC’s Micro Bachat', 751, '512N329V03', 'Tiny-premium savings plus cover for low incomes.', 'कम आय वर्ग के लिए बेहद किफायती बचत और जीवन सुरक्षा योजना।'],
+      ['mi', 'LIC’s Jan Suraksha', 880, '512N388V01', 'Low-cost micro cover built for small budgets.', 'छोटे बजट और सीमित आय वाले परिवारों के लिए माइक्रो सुरक्षा प्लान।']
+    ];
+
     let icat = 'all', iq = '';
-    function insUI() { const v = $('#iv'); if (!v.dataset.b) { v.dataset.b = 1; v.innerHTML = `<div class='glass ih'><h2>LIC plans, in plain words</h2><p class='mut'>Every plan currently listed on LIC’s official site, grouped by what it does for you. Tap a goal to filter.</p><div class='is'><span><b>${INS.length}</b> live plans</span><span><b>${CATS.length}</b> categories</span><span>Checked Oct 2026</span></div><div class='ich' id='ich'></div><input id='isq' type='search' placeholder='Search a plan, e.g. Jeevan, child, pension' aria-label='Search plans'></div><div class='ig' id='ig'></div><p class='src'>Source: LIC of India official website (<a href='https://originlic.licindia.in/insurance-plan' target='_blank' rel='noopener'>licindia.in</a>), plan pages updated between Jan and Oct 2026. Riders, group, GIFT City and withdrawn plans are not listed. Descriptions are simplified; confirm benefits, eligibility and premiums with LIC before buying.</p>`; $('#ich').addEventListener('click', e => { const b = e.target.closest('.ic'); if (!b) return; icat = b.dataset.c; insRender() }); $('#isq').addEventListener('input', e => { iq = e.target.value.toLowerCase(); insRender() }); $('#ig').addEventListener('click', e => { const b = e.target.closest('.cb'); if (b) openCalc(+b.dataset.n) }) } insRender() }
-    function insRender() { $('#ich').innerHTML = [['all', 'All plans', '✨', 'var(--a)']].concat(CATS.map(c => [c[0], c[1], c[2], c[3]])).map(c => `<button class='ic${icat == c[0] ? ' on' : ''}' data-c='${c[0]}' style='--cc:${c[3]}'>${c[2]} ${c[1]}<i>${c[0] == 'all' ? INS.length : INS.filter(p => p[0] == c[0]).length}</i></button>`).join(''); const L = INS.filter(p => (icat == 'all' || p[0] == icat) && (!iq || (p[1] + ' ' + p[4] + ' ' + CAT[p[0]][4]).toLowerCase().includes(iq))); $('#ig').innerHTML = L.length ? L.map((p, i) => { const c = CAT[p[0]]; return `<article class='pc' style='--cc:${c[3]};--i:${i}'><div class='pt'><span>${c[2]} ${c[4]}</span><em>Plan ${p[2]}</em></div><h3>${p[1]}</h3><p>${p[4]}</p><div class='pf'><b>${p[5] || c[5]}</b><small>UIN ${p[3]}</small></div><button class='cb' data-n='${p[2]}'>🧮 Calculate what you get</button></article>` }).join('') : "<div class='emp'>No plans match that search.</div>" }
+
+    function insUI() {
+      const v = $('#iv');
+      const t = I18N[curLang];
+      if (!v.dataset.b) {
+        v.dataset.b = 1;
+        v.innerHTML = `<div class='glass ih'><h2>${t.insHead}</h2><p class='mut'>${t.insSub}</p><div class='is'><span><b>${INS.length}</b> ${t.livePlans}</span><span><b>${CATS.length}</b> ${t.categories}</span><span>${t.checkedDate}</span></div><div class='ich' id='ich'></div><input id='isq' type='search' placeholder='${t.searchPlans}' aria-label='${t.searchPlans}'></div><div class='ig' id='ig'></div><p class='src'>${t.insSrc}</p>`;
+        $('#ich').addEventListener('click', e => { const b = e.target.closest('.ic'); if (!b) return; icat = b.dataset.c; insRender() });
+        $('#isq').addEventListener('input', e => { iq = e.target.value.toLowerCase(); insRender() });
+        $('#ig').addEventListener('click', e => { const b = e.target.closest('.cb'); if (b) openCalc(+b.dataset.n) });
+      }
+      insRender();
+    }
+
+    function insRender() {
+      const t = I18N[curLang];
+      $('#ich').innerHTML = [['all', t.allPlans, '✨', 'var(--a)']].concat(CATS.map(c => [c[0], curLang == 'hi' ? c[2] : c[1], c[3], c[4]])).map(c => `<button class='ic${icat == c[0] ? ' on' : ''}' data-c='${c[0]}' style='--cc:${c[3]}'>${c[2]} ${c[1]}<i>${c[0] == 'all' ? INS.length : INS.filter(p => p[0] == c[0]).length}</i></button>`).join('');
+      const L = INS.filter(p => {
+        const c = CAT[p[0]];
+        const catSearch = (curLang == 'hi' ? c[6] + ' ' + c[2] : c[5] + ' ' + c[1]).toLowerCase();
+        const desc = (curLang == 'hi' && p[5] ? p[5] : p[4]).toLowerCase();
+        const name = p[1].toLowerCase();
+        return (icat == 'all' || p[0] == icat) && (!iq || (name + ' ' + desc + ' ' + catSearch).includes(iq));
+      });
+      $('#ig').innerHTML = L.length ? L.map((p, i) => {
+        const c = CAT[p[0]];
+        const catLabel = curLang == 'hi' ? c[6] : c[5];
+        const badgeLabel = curLang == 'hi' ? (p[7] || c[8]) : (p[6] || c[7]);
+        const desc = curLang == 'hi' && p[5] ? p[5] : p[4];
+        return `<article class='pc' style='--cc:${c[4]};--i:${i}'><div class='pt'><span>${c[3]} ${catLabel}</span><em>${t.planWord} ${p[2]}</em></div><h3>${p[1]}</h3><p>${desc}</p><div class='pf'><b>${badgeLabel}</b><small>UIN ${p[3]}</small></div><button class='cb' data-n='${p[2]}'>${t.calcBtn}</button></article>`;
+      }).join('') : `<div class='emp'>${t.noPlans}</div>`;
+    }
+
     const RATE = { 714: 5.5, 715: 5.5, 717: 5, 733: 5.5, 736: 5.5, 774: 5.5, 760: 5.5, 912: 5.5, 881: 5.5, 748: 5.5, 720: 5, 721: 5, 732: 5, 734: 5, 751: 4.5 };
     function model(p) {
       const n = p[2], c = p[0], r = RATE[n] || 5;
-      if (c == 'term') return { m: 'term', F: [['sa', 'Cover amount', 500000, 100000000, 500000, 10000000, 1], ['age', 'Your age', 18, 65, 1, 30], ['y', 'Policy term (years)', 5, 40, 1, 25]] };
-      if (n == 745) return { m: 'inc', pc: 8, F: [['sa', 'Sum assured', 200000, 10000000, 50000, 1000000, 1], ['age', 'Your age', 0, 55, 1, 30], ['ppt', 'Premium paying term (years)', 15, 30, 5, 20]] };
-      if (n == 771) return { m: 'inc', pc: 10, F: [['sa', 'Sum assured', 500000, 10000000, 50000, 1000000, 1], ['age', 'Your age', 0, 50, 1, 30], ['ppt', 'Premium paying term (years)', 5, 12, 1, 8]] };
-      if (n == 758) return { m: 'defann', F: [['price', 'Amount you invest', 100000, 50000000, 50000, 1000000, 1], ['d', 'Years to wait before pension', 5, 20, 1, 10], ['g', 'Assumed growth while waiting (%)', 3, 8, .1, 5.5], ['ar', 'Assumed annuity rate (%)', 4, 9, .1, 7]] };
-      if (c == 'pen' && n != 867) return { m: 'ann', F: [['price', 'Amount you invest', 100000, 50000000, 50000, 1000000, 1], ['ar', 'Assumed annuity rate (%)', 4, 9, .1, 6.5]] };
-      if (c == 'ulip' || n == 867) { const s = n == 749; return { m: 'ulip', s, pen: n == 867, F: s ? [['p', 'One-time investment', 100000, 10000000, 50000, 500000, 1], ['y', 'Years invested', 5, 30, 1, 10], ['r', 'Assumed market return (%)', 4, 15, .1, 10]] : [['p', 'Yearly premium', 10000, 1000000, 5000, 100000, 1], ['y', 'Years invested', 5, 30, 1, 15], ['r', 'Assumed market return (%)', 4, 15, .1, 10]] } }
-      if (c == 'hl' || n == 880) return { m: 'cov', F: [['cov', 'Cover amount', 100000, 10000000, 100000, 500000, 1]] };
-      if (n == 717) return { m: 'sav', s: 1, F: [['p', 'One-time premium', 50000, 10000000, 10000, 500000, 1], ['y', 'Policy term (years)', 5, 30, 1, 10], ['r', 'Assumed return (%)', 2, 8, .1, r]] };
-      return { m: 'sav', F: [['p', 'Yearly premium', 5000, 1000000, 5000, 100000, 1], ['ppt', 'Years you pay premium', 5, 40, 1, 15], ['y', 'Policy term (years)', 5, 40, 1, 20], ['r', 'Assumed return (%)', 2, 8, .1, r]] }
+      if (c == 'term') return { m: 'term', F: [['sa', 'Cover amount', 500000, 100000000, 500000, 10000000, 1, 'कवर राशि (Sum Assured)'], ['age', 'Your age', 18, 65, 1, 30, 0, 'आपकी उम्र'], ['y', 'Policy term (years)', 5, 40, 1, 25, 0, 'पॉलिसी अवधि (वर्ष)']] };
+      if (n == 745) return { m: 'inc', pc: 8, F: [['sa', 'Sum assured', 200000, 10000000, 50000, 1000000, 1, 'बीमा राशि (Sum Assured)'], ['age', 'Your age', 0, 55, 1, 30, 0, 'आपकी उम्र'], ['ppt', 'Premium paying term (years)', 15, 30, 5, 20, 0, 'प्रीमियम भुगतान अवधि (वर्ष)']] };
+      if (n == 771) return { m: 'inc', pc: 10, F: [['sa', 'Sum assured', 500000, 10000000, 50000, 1000000, 1, 'बीमा राशि (Sum Assured)'], ['age', 'Your age', 0, 50, 1, 30, 0, 'आपकी उम्र'], ['ppt', 'Premium paying term (years)', 5, 12, 1, 8, 0, 'प्रीमियम भुगतान अवधि (वर्ष)']] };
+      if (n == 758) return { m: 'defann', F: [['price', 'Amount you invest', 100000, 50000000, 50000, 1000000, 1, 'निवेश राशि'], ['d', 'Years to wait before pension', 5, 20, 1, 10, 0, 'पेंशन से पहले प्रतीक्षा वर्ष'], ['g', 'Assumed growth while waiting (%)', 3, 8, .1, 5.5, 0, 'प्रतीक्षा अवधि में अनुमानित वृद्धि (%)'], ['ar', 'Assumed annuity rate (%)', 4, 9, .1, 7, 0, 'अनुमानित वार्षिकी (Annuity) दर (%)']] };
+      if (c == 'pen' && n != 867) return { m: 'ann', F: [['price', 'Amount you invest', 100000, 50000000, 50000, 1000000, 1, 'निवेश राशि'], ['ar', 'Assumed annuity rate (%)', 4, 9, .1, 6.5, 0, 'अनुमानित वार्षिकी (Annuity) दर (%)']] };
+      if (c == 'ulip' || n == 867) { const s = n == 749; return { m: 'ulip', s, pen: n == 867, F: s ? [['p', 'One-time investment', 100000, 10000000, 50000, 500000, 1, 'एकमुश्त निवेश'], ['y', 'Years invested', 5, 30, 1, 10, 0, 'निवेश अवधि (वर्ष)'], ['r', 'Assumed market return (%)', 4, 15, .1, 10, 0, 'अनुमानित बाजार रिटर्न (%)']] : [['p', 'Yearly premium', 10000, 1000000, 5000, 100000, 1, 'वार्षिक प्रीमियम'], ['y', 'Years invested', 5, 30, 1, 15, 0, 'निवेश अवधि (वर्ष)'], ['r', 'Assumed market return (%)', 4, 15, .1, 10, 0, 'अनुमानित बाजार रिटर्न (%)']] } }
+      if (c == 'hl' || n == 880) return { m: 'cov', F: [['cov', 'Cover amount', 100000, 10000000, 100000, 500000, 1, 'कवर राशि']] };
+      if (n == 717) return { m: 'sav', s: 1, F: [['p', 'One-time premium', 50000, 10000000, 10000, 500000, 1, 'एकमुश्त प्रीमियम'], ['y', 'Policy term (years)', 5, 30, 1, 10, 0, 'पॉलिसी अवधि (वर्ष)'], ['r', 'Assumed return (%)', 2, 8, .1, r, 0, 'अनुमानित रिटर्न (%)']] };
+      return { m: 'sav', F: [['p', 'Yearly premium', 5000, 1000000, 5000, 100000, 1, 'वार्षिक प्रीमियम'], ['ppt', 'Years you pay premium', 5, 40, 1, 15, 0, 'प्रीमियम भुगतान वर्ष'], ['y', 'Policy term (years)', 5, 40, 1, 20, 0, 'पॉलिसी अवधि (वर्ष)'], ['r', 'Assumed return (%)', 2, 8, .1, r, 0, 'अनुमानित रिटर्न (%)']] }
     }
+
     function mcalc(m, v) {
-      const fv = (p, n, r, pay) => { let b = 0; for (let t = 1; t <= n; t++) { if (t <= pay) b += p; b *= 1 + r / 100 } return b };
-      if (m.m == 'term') { const pr = v.sa / 1e5 * 95 * Math.pow(1.075, v.age - 25) * (1 + (v.y - 20) * .004); return { main: ['Cover for your family', v.sa], st: [['Est. yearly premium', pr], ['Total premium over term', pr * v.y], ['Cover per ' + S.trim() + '1 of yearly premium', v.sa / pr, 2]], note: 'Pays only if the insured person passes away during the term; nothing is paid at the end. The premium is a rough guess: your real price depends on health, smoking and gender.' } }
-      if (m.m == 'inc') { const i = v.sa * m.pc / 100, s = v.age + v.ppt, y = Math.max(0, 100 - s); return { main: ['Yearly income you can count on', i], st: [['Income starts at age', s, 3], ['Years of income', y, 3], ['Total income to age 100', i * y]], note: 'Income is ' + m.pc + '% of the sum assured each year after the premium term. The sum assured (plus any bonus) is also paid at the end. Your premium depends on your age, so ask LIC for a quote.' } }
-      if (m.m == 'ann') { const y = v.price * v.ar / 100; return { main: ['Pension every year', y], st: [['Per month', y / 12], ['Years to earn back your money', 100 / v.ar, 4]], note: 'Annuity rates change with your age, pension option and LIC’s current rates. Edit the rate to match your quote.' } }
-      if (m.m == 'defann') { const c = v.price * Math.pow(1 + v.g / 100, v.d), y = c * v.ar / 100; return { main: ['Pension every year after waiting', y], st: [['Fund when pension starts', c], ['Per month', y / 12], ['Years before pension starts', v.d, 3]], note: 'Both rates are assumptions. Edit them to match your LIC quote.' } }
-      if (m.m == 'ulip') { const rn = v.r - 1.5, b = m.s ? v.p * Math.pow(1 + rn / 100, v.y) : fv(v.p, v.y, rn, v.y), paid = m.s ? v.p : v.p * v.y; return { main: ['Estimated fund value', b], st: [['Total invested', paid], ['Est. growth', b - paid], m.pen ? ['Pension per year at 6% annuity', b * .06] : ['Min. cover (approx.)', m.s ? v.p * 1.25 : v.p * 10]], note: 'Market-linked: returns are not guaranteed and can be lower or even negative. We subtract 1.5% a year for assumed charges.' } }
-      if (m.m == 'cov') return { main: ['Cover you choose', v.cov], st: [], note: 'The actual benefit depends on the option, waiting period and conditions in LIC’s policy document. Ask LIC for exact terms.' };
-      const y = Math.max(v.y, m.s ? v.y : v.ppt), b = m.s ? v.p * Math.pow(1 + v.r / 100, v.y) : fv(v.p, y, v.r, v.ppt), paid = m.s ? v.p : v.p * v.ppt; return { main: ['Estimated amount you get', b], st: [['Total you pay', paid], ['Est. gain', b - paid], m.s ? ['Life cover (approx. 125%)', v.p * 1.25] : ['Life cover (approx. 10×)', v.p * 10]], note: 'Estimate using a steady yearly return that you can edit. Real payouts include LIC bonuses and guaranteed additions that vary, and money-back plans pay in instalments.' }
+      const t = I18N[curLang];
+      const fv = (p, n, r, pay) => { let b = 0; for (let yr = 1; yr <= n; yr++) { if (yr <= pay) b += p; b *= 1 + r / 100 } return b };
+      if (m.m == 'term') {
+        const pr = v.sa / 1e5 * 95 * Math.pow(1.075, v.age - 25) * (1 + (v.y - 20) * .004);
+        return {
+          main: [t.mTermMain, v.sa],
+          st: [
+            [t.mEstYrPrem, pr],
+            [t.mTotPrem, pr * v.y],
+            [t.mCovPer + S.trim() + '1' + t.mCovPerSuf, v.sa / pr, 2]
+          ],
+          note: t.mTermNote
+        };
+      }
+      if (m.m == 'inc') {
+        const i = v.sa * m.pc / 100, s = v.age + v.ppt, y = Math.max(0, 100 - s);
+        return {
+          main: [t.mIncMain, i],
+          st: [
+            [t.mIncStartAge, s, 3],
+            [t.mIncYears, y, 3],
+            [t.mIncTot100, i * y]
+          ],
+          note: t.mIncNote(m.pc)
+        };
+      }
+      if (m.m == 'ann') {
+        const y = v.price * v.ar / 100;
+        return {
+          main: [t.mAnnMain, y],
+          st: [
+            [t.mAnnPerMo, y / 12],
+            [t.mAnnYearsBack, 100 / v.ar, 4]
+          ],
+          note: t.mAnnNote
+        };
+      }
+      if (m.m == 'defann') {
+        const c = v.price * Math.pow(1 + v.g / 100, v.d), y = c * v.ar / 100;
+        return {
+          main: [t.mDefannMain, y],
+          st: [
+            [t.mDefannFund, c],
+            [t.mAnnPerMo, y / 12],
+            [t.mDefannYrsWait, v.d, 3]
+          ],
+          note: t.mDefannNote
+        };
+      }
+      if (m.m == 'ulip') {
+        const rn = v.r - 1.5, b = m.s ? v.p * Math.pow(1 + rn / 100, v.y) : fv(v.p, v.y, rn, v.y), paid = m.s ? v.p : v.p * v.y;
+        return {
+          main: [t.mUlipMain, b],
+          st: [
+            [t.mUlipTotInv, paid],
+            [t.mUlipGrowth, b - paid],
+            m.pen ? [t.mUlipPen6, b * .06] : [t.mUlipMinCov, m.s ? v.p * 1.25 : v.p * 10]
+          ],
+          note: t.mUlipNote
+        };
+      }
+      if (m.m == 'cov') return { main: [t.mCovMain, v.cov], st: [], note: t.mCovNote };
+      const y = Math.max(v.y, m.s ? v.y : v.ppt), b = m.s ? v.p * Math.pow(1 + v.r / 100, v.y) : fv(v.p, y, v.r, v.ppt), paid = m.s ? v.p : v.p * v.ppt;
+      return {
+        main: [t.mSavMain, b],
+        st: [
+          [t.mSavTotPay, paid],
+          [t.mSavGain, b - paid],
+          m.s ? [t.mSavLife125, v.p * 1.25] : [t.mSavLife10x, v.p * 10]
+        ],
+        note: t.mSavNote
+      };
     }
+
     let cm = null;
-    function mRun() { const r = mcalc(cm.m, cm.v); $('#mbl').textContent = r.main[0]; cnt($('#mbig'), r.main[1], r.main[2]); const s = $('#mst'); if (s.children.length != r.st.length) s.innerHTML = r.st.map(() => `<div class='st'><small></small><b>0</b></div>`).join(''); r.st.forEach((q, j) => { const e = s.children[j]; e.firstChild.textContent = q[0]; cnt(e.lastChild, q[1], q[2]) }); $('#mnt').textContent = r.note + ' Illustration only, not an LIC quote.' }
-    function openCalc(n) {
-      const p = INS.find(x => x[2] == n), m = model(p), c = CAT[p[0]]; cm = { p, m, v: {} }; m.F.forEach(f => cm.v[f[0]] = f[5]); const d = document.createElement('div'); d.id = 'md';
-      d.innerHTML = `<div class='mp' style='--cc:${c[3]}'><button class='mx' aria-label='Close'>✕</button><div class='pt'><span>${c[2]} ${c[4]}</span><em>Plan ${p[2]}</em></div><h2>${p[1]}</h2><p class='mut'>Change the numbers and see what you could get.</p>${m.F.map((x, j) => `<div class='f'><div class='r'><label for='mn${j}'>${x[1]}</label><div class='num'><span>${x[6] ? S.trim() : ''}</span><input id='mn${j}' data-j='${j}' type='number' inputmode='decimal' min='${x[2]}' max='${x[3]}' step='${x[4]}' value='${x[5]}'></div></div><input id='mr${j}' data-j='${j}' type='range' min='${x[2]}' max='${x[3]}' step='${x[4]}' value='${x[5]}'></div>`).join('')}<div class='hero' style='margin-top:18px'><small id='mbl'></small><div class='big' id='mbig'>0</div></div><div class='stats' id='mst'></div><p class='src' id='mnt'></p></div>`;
-      d.addEventListener('click', e => { if (e.target == d || e.target.closest('.mx')) closeCalc() });
-      d.addEventListener('input', e => { const t = e.target, j = t.dataset.j; if (j == null) return; const x = cm.m.F[j]; let v = parseFloat(t.value); if (isNaN(v)) return; v = Math.min(x[3], Math.max(x[2], v)); cm.v[x[0]] = v; if (t.type == 'range') $('#mn' + j).value = v; else $('#mr' + j).value = v; fill($('#mr' + j)); mRun() });
-      document.body.appendChild(d); document.body.style.overflow = 'hidden'; d.querySelectorAll('input[type=range]').forEach(fill); mRun()
+    function mRun() {
+      const r = mcalc(cm.m, cm.v);
+      $('#mbl').textContent = r.main[0];
+      cnt($('#mbig'), r.main[1], r.main[2]);
+      const s = $('#mst');
+      if (s.children.length != r.st.length) s.innerHTML = r.st.map(() => `<div class='st'><small></small><b>0</b></div>`).join('');
+      r.st.forEach((q, j) => {
+        const e = s.children[j];
+        e.firstChild.textContent = q[0];
+        cnt(e.lastChild, q[1], q[2]);
+      });
+      $('#mnt').textContent = r.note + I18N[curLang].modalNoteSuffix;
     }
+
+    function openCalc(n) {
+      const p = INS.find(x => x[2] == n), m = model(p), c = CAT[p[0]];
+      cm = { p, m, v: {} };
+      m.F.forEach(f => cm.v[f[0]] = f[5]);
+      const d = document.createElement('div');
+      d.id = 'md';
+      const t = I18N[curLang];
+      const catLabel = curLang == 'hi' ? c[6] : c[5];
+      d.innerHTML = `<div class='mp' style='--cc:${c[4]}'>
+        <button class='mx' aria-label='${t.closeLabel}'>✕</button>
+        <div class='pt'><span>${c[3]} ${catLabel}</span><em>${t.planWord} ${p[2]}</em></div>
+        <h2>${p[1]}</h2>
+        <p class='mut'>${t.modalSub}</p>
+        ${m.F.map((x, j) => {
+          const label = curLang == 'hi' && x[7] ? x[7] : x[1];
+          return `<div class='f'>
+            <div class='r'>
+              <label for='mn${j}'>${label}</label>
+              <div class='num'><span>${x[6] ? S.trim() : ''}</span><input id='mn${j}' data-j='${j}' type='number' inputmode='decimal' min='${x[2]}' max='${x[3]}' step='${x[4]}' value='${x[5]}'></div>
+            </div>
+            <input id='mr${j}' data-j='${j}' type='range' min='${x[2]}' max='${x[3]}' step='${x[4]}' value='${x[5]}'>
+          </div>`;
+        }).join('')}
+        <div class='hero' style='margin-top:18px'><small id='mbl'></small><div class='big' id='mbig'>0</div></div>
+        <div class='stats' id='mst'></div>
+        <p class='src' id='mnt'></p>
+      </div>`;
+      d.addEventListener('click', e => { if (e.target == d || e.target.closest('.mx')) closeCalc() });
+      d.addEventListener('input', e => {
+        const target = e.target, j = target.dataset.j;
+        if (j == null) return;
+        const x = cm.m.F[j];
+        let v = parseFloat(target.value);
+        if (isNaN(v)) return;
+        v = Math.min(x[3], Math.max(x[2], v));
+        cm.v[x[0]] = v;
+        if (target.type == 'range') $('#mn' + j).value = v; else $('#mr' + j).value = v;
+        fill($('#mr' + j));
+        mRun();
+      });
+      document.body.appendChild(d);
+      document.body.style.overflow = 'hidden';
+      d.querySelectorAll('input[type=range]').forEach(fill);
+      mRun();
+    }
+
     function closeCalc() { const d = $('#md'); if (d) d.remove(); document.body.style.overflow = '' }
     addEventListener('keydown', e => { if (e.key == 'Escape') closeCalc() });
-    function cnt(el, to, pct) { const from = el._v || 0; el._v = to; cancelAnimationFrame(el._r); const t0 = performance.now(); (function s(t) { const k = Math.min(1, (t - t0) / 650), e = 1 - Math.pow(1 - k, 3), v = from + (to - from) * e; el.textContent = pct == 3 ? Math.round(v) : pct == 4 ? v.toFixed(1) + ' yrs' : pct ? v.toFixed(2) + (pct == 2 ? '×' : '%') : f(v); if (k < 1) el._r = requestAnimationFrame(s) })(t0) }
+
+    function cnt(el, to, pct) {
+      const from = el._v || 0; el._v = to; cancelAnimationFrame(el._r); const t0 = performance.now();
+      (function s(t) {
+        const k = Math.min(1, (t - t0) / 650), e = 1 - Math.pow(1 - k, 3), v = from + (to - from) * e;
+        el.textContent = pct == 3 ? Math.round(v) : pct == 4 ? v.toFixed(1) + (curLang == 'hi' ? ' वर्ष' : ' yrs') : pct ? v.toFixed(2) + (pct == 2 ? '×' : '%') : f(v);
+        if (k < 1) el._r = requestAnimationFrame(s)
+      })(t0)
+    }
+
     const fill = r => r.style.setProperty('--p', (r.value - r.min) / (r.max - r.min) * 100 + '%');
+
     function build() {
-      const c = CALCS[ci]; $('#cv').hidden = !!c.ins; $('#iv').hidden = !c.ins; if (c.ins) { insUI(); return } $('#ttl').textContent = c.n + ' Calculator'; $('#dsc').textContent = c.d; $('#big')._v = 0; $('#stats').innerHTML = '';
-      $('#flds').innerHTML = c.F.map((x, j) => x.seg ? `<div class="f"><label>${x.l}</label><div class="seg" data-j="${j}">${x.seg.map((s, q) => `<button data-q="${q}" class="${q == x.v ? 'on' : ''}">${s}</button>`).join('')}</div></div>` :
-        `<div class="f"><div class="r"><label for="n${j}">${x.l}</label><div class="num"><span>${x.u == 'c' ? S.trim() : ''}</span><input id="n${j}" data-j="${j}" type="number" inputmode="decimal" min="${x.min}" max="${x.max}" step="${x.st}" value="${x.v}"><span>${x.u == 'c' ? '' : x.u}</span></div></div><input id="r${j}" data-j="${j}" type="range" min="${x.min}" max="${x.max}" step="${x.st}" value="${x.v}"></div>`).join('');
-      document.querySelectorAll('#flds input[type=range]').forEach(fill); run(true)
+      const c = CALCS[ci];
+      $('#cv').hidden = !!c.ins;
+      $('#iv').hidden = !c.ins;
+      if (c.ins) { insUI(); return }
+      const cName = typeof c.n === 'object' ? c.n[curLang] : c.n;
+      const cDesc = typeof c.d === 'object' ? c.d[curLang] : c.d;
+      $('#ttl').textContent = cName + I18N[curLang].calcSuffix;
+      $('#dsc').textContent = cDesc;
+      $('#big')._v = 0;
+      $('#stats').innerHTML = '';
+      $('#flds').innerHTML = c.F.map((x, j) => {
+        const label = typeof x.l === 'object' ? x.l[curLang] : x.l;
+        if (x.seg) {
+          const segList = Array.isArray(x.seg) ? x.seg : (x.seg[curLang] || x.seg.en);
+          return `<div class="f"><label>${label}</label><div class="seg" data-j="${j}">${segList.map((s, q) => `<button data-q="${q}" class="${q == x.v ? 'on' : ''}">${s}</button>`).join('')}</div></div>`;
+        }
+        const unit = x.u == 'c' ? '' : (x.u == 'yrs' && curLang == 'hi' ? 'वर्ष' : x.u);
+        const prefix = x.u == 'c' ? S.trim() : '';
+        return `<div class="f"><div class="r"><label for="n${j}">${label}</label><div class="num"><span>${prefix}</span><input id="n${j}" data-j="${j}" type="number" inputmode="decimal" min="${x.min}" max="${x.max}" step="${x.st}" value="${x.v}"><span>${unit}</span></div></div><input id="r${j}" data-j="${j}" type="range" min="${x.min}" max="${x.max}" step="${x.st}" value="${x.v}"></div>`;
+      }).join('');
+      document.querySelectorAll('#flds input[type=range]').forEach(fill);
+      run(true);
     }
+
     function run(first) {
-      const c = CALCS[ci], v = {}; c.F.forEach(x => v[x.k] = x.seg ? x.vals[x.v] : x.v); const r = last = c.run(v);
-      $('#bl').textContent = r.main[0]; cnt($('#big'), r.main[1], r.main[2]);
-      const s = $('#stats'); if (s.children.length != r.st.length) s.innerHTML = r.st.map(() => '<div class="st"><small></small><b>0</b></div>').join('');
+      const c = CALCS[ci], v = {};
+      c.F.forEach(x => v[x.k] = x.seg ? x.vals[x.v] : x.v);
+      const r = last = c.run(v);
+      $('#bl').textContent = r.main[0];
+      cnt($('#big'), r.main[1], r.main[2]);
+      const s = $('#stats');
+      if (s.children.length != r.st.length) s.innerHTML = r.st.map(() => '<div class="st"><small></small><b>0</b></div>').join('');
       r.st.forEach((q, j) => { const e = s.children[j]; e.firstChild.textContent = q[0]; cnt(e.lastChild, q[1], q[2]) });
-      const g = Math.max(0, r.g), T = r.a + g || 1, pa = r.a / T; $('#da').style.strokeDasharray = `${C * pa} ${C}`; $('#dp').textContent = Math.round((1 - pa) * 100) + '%'; $('#ds').textContent = r.lg.toLowerCase();
+      const g = Math.max(0, r.g), T = r.a + g || 1, pa = r.a / T;
+      $('#da').style.strokeDasharray = `${C * pa} ${C}`;
+      $('#dp').textContent = Math.round((1 - pa) * 100) + '%';
+      $('#ds').textContent = r.lg.toLowerCase();
       $('#lg').innerHTML = `<div class="lg"><i style="background:var(--a)"></i>${r.la}<b>${f(r.a)}</b></div><div class="lg"><i style="background:var(--c)"></i>${r.lg}<b>${f(g)}</b></div>`;
-      $('#cl').innerHTML = `<span><i style="background:var(--b)"></i>${r.l2}</span><span><i style="background:var(--a)"></i>${r.l1}</span>`; chart(first)
+      $('#cl').innerHTML = `<span><i style="background:var(--b)"></i>${r.l2}</span><span><i style="background:var(--a)"></i>${r.l1}</span>`;
+      chart(first);
     }
+
     function chart(first) {
-      if (!last) return; const W = $('#chart').clientWidth || 320, H = 230, pl = 46, pr = 8, pt = 10, pb = 24, s = last.ser, xm = s[s.length - 1].x || 1, ym = Math.max(...s.map(p => Math.max(p.a, p.b))) * 1.08 || 1;
-      const X = x => pl + (W - pl - pr) * x / xm, Y = y => H - pb - (H - pt - pb) * y / ym; pts = s.map(p => [X(p.x), Y(p.b), Y(p.a), p]);
+      if (!last) return;
+      const W = $('#chart').clientWidth || 320, H = 230, pl = 46, pr = 8, pt = 10, pb = 24, s = last.ser,
+        xm = s[s.length - 1].x || 1, ym = Math.max(...s.map(p => Math.max(p.a, p.b))) * 1.08 || 1;
+      const X = x => pl + (W - pl - pr) * x / xm, Y = y => H - pb - (H - pt - pb) * y / ym;
+      pts = s.map(p => [X(p.x), Y(p.b), Y(p.a), p]);
       const ln = i => pts.map((p, j) => (j ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[i].toFixed(1)).join('');
-      let g = ''; for (let i = 0; i <= 4; i++) { const y = ym * i / 4; g += `<line x1="${pl}" x2="${W - pr}" y1="${Y(y)}" y2="${Y(y)}" class="gl"/><text x="${pl - 6}" y="${Y(y) + 4}" text-anchor="end" class="ax">${sh(y)}</text>`; const x = xm * i / 4; g += `<text x="${X(x)}" y="${H - 6}" text-anchor="${i == 0 ? 'start' : i == 4 ? 'end' : 'middle'}" class="ax">${+x.toFixed(1)}y</text>` }
-      $('#cs').setAttribute('viewBox', `0 0 ${W} ${H}`);
-      $('#cs').innerHTML = `<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--b);stop-opacity:.5"/><stop offset="1" style="stop-color:var(--b);stop-opacity:0"/></linearGradient></defs>${g}<path d="${ln(1)}L${pts[pts.length - 1][0]} ${Y(0)}L${pl} ${Y(0)}Z" fill="url(#ag)" class="${first ? 'fade' : ''}"/><path d="${ln(2)}" class="l2 ${first ? 'fade' : ''}"/><path d="${ln(1)}" pathLength="1" class="l1${first ? ' draw' : ''}"/><line id="hl" y1="${pt}" y2="${H - pb}" class="hl"/><circle id="hd" r="5" class="hd"/>`
-    }
-    $('#cs').addEventListener('pointermove', e => {
-      if (!pts.length) return; const r = e.currentTarget.getBoundingClientRect(), x = e.clientX - r.left; let b = pts[0]; pts.forEach(p => { if (Math.abs(p[0] - x) < Math.abs(b[0] - x)) b = p });
-      const h = $('#hl'), d = $('#hd'), t = $('#tip'); h.setAttribute('x1', b[0]); h.setAttribute('x2', b[0]); h.style.opacity = 1; d.setAttribute('cx', b[0]); d.setAttribute('cy', b[1]); d.style.opacity = 1;
-      t.innerHTML = `Year ${+b[3].x.toFixed(1)}<br>${last.l2}: <b>${f(b[3].b)}</b><br>${last.l1}: ${f(b[3].a)}`; t.style.opacity = 1; t.style.left = Math.min(Math.max(b[0] - 60, 0), Math.max(0, r.width - 150)) + 'px'
-    });
-    $('#cs').addEventListener('pointerleave', () => { const h = $('#hl'), d = $('#hd'); if (h) { h.style.opacity = 0; d.style.opacity = 0 } $('#tip').style.opacity = 0 });
-    $('#flds').addEventListener('input', e => {
-      const t = e.target, j = t.dataset.j; if (j == null) return; const F = CALCS[ci].F[j]; let v = parseFloat(t.value); if (isNaN(v)) return; v = Math.min(F.max, Math.max(F.min, v)); F.v = v;
-      if (t.type == 'range') { $('#n' + j).value = v } else { const r = $('#r' + j); r.value = v } fill($('#r' + j)); run()
-    });
-    $('#flds').addEventListener('change', e => { const j = e.target.dataset.j; if (j != null && e.target.type == 'number') e.target.value = CALCS[ci].F[j].v });
-    $('#flds').addEventListener('click', e => { const b = e.target.closest('.seg button'); if (!b) return; CALCS[ci].F[b.parentNode.dataset.j].v = +b.dataset.q;[...b.parentNode.children].forEach(x => x.classList.toggle('on', x == b)); run() });
-    $('#tabs').innerHTML = CALCS.map((c, j) => `<button class="tab${j ? '' : ' on'}" data-j="${j}"><span>${c.ic}</span>${c.n}</button>`).join('');
-    $('#tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; ci = +b.dataset.j; document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x == b)); b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); build() });
-    $('#cur').innerHTML = CURS.map((c, i) => `<option value="${i}">${c[0]} ${c[1].trim()}</option>`).join('');
-    $('#cur').addEventListener('change', e => { S = CURS[e.target.value][1]; L = CURS[e.target.value][2]; build() });
-    $('#th').addEventListener('click', () => { const r = document.documentElement, dk = r.dataset.theme ? r.dataset.theme == 'dark' : matchMedia('(prefers-color-scheme:dark)').matches; r.dataset.theme = dk ? 'light' : 'dark' });
-    document.addEventListener('pointermove', e => { const g = e.target.closest && e.target.closest('.glass'); if (!g) return; const r = g.getBoundingClientRect(); g.style.setProperty('--mx', e.clientX - r.left + 'px'); g.style.setProperty('--my', e.clientY - r.top + 'px') });
-    let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { chart(false); rs() }, 150) });
-    /* particle field */
-    const cv = $('#fx'), cx = cv.getContext('2d'); let P = [], W0, H0, mx = -999, my = -999, fr = 0, dc = '150,160,255';
-    function rs() { const d = Math.min(devicePixelRatio || 1, 2); W0 = innerWidth; H0 = innerHeight; cv.width = W0 * d; cv.height = H0 * d; cx.setTransform(d, 0, 0, d, 0, 0); P = Array.from({ length: Math.min(70, Math.round(W0 * H0 / 20000)) }, () => ({ x: Math.random() * W0, y: Math.random() * H0, vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45 })) }
-    addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY });
-    function tick() {
-      if (fr++ % 40 == 0) dc = getComputedStyle(document.documentElement).getPropertyValue('--dot').trim() || dc; cx.clearRect(0, 0, W0, H0);
-      for (const p of P) { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > W0) p.vx *= -1; if (p.y < 0 || p.y > H0) p.vy *= -1; cx.fillStyle = `rgba(${dc},.7)`; cx.beginPath(); cx.arc(p.x, p.y, 1.8, 0, 7); cx.fill() }
-      for (let i = 0; i < P.length; i++) {
-        for (let j = i + 1; j < P.length; j++) { const d = Math.hypot(P[i].x - P[j].x, P[i].y - P[j].y); if (d < 110) { cx.strokeStyle = `rgba(${dc},${.22 * (1 - d / 110)})`; cx.beginPath(); cx.moveTo(P[i].x, P[i].y); cx.lineTo(P[j].x, P[j].y); cx.stroke() } }
-        const d = Math.hypot(P[i].x - mx, P[i].y - my); if (d < 150) { cx.strokeStyle = `rgba(${dc},${.5 * (1 - d / 150)})`; cx.beginPath(); cx.moveTo(P[i].x, P[i].y); cx.lineTo(mx, my); cx.stroke() }
+      let g = '';
+      for (let i = 0; i <= 4; i++) {
+        const y = ym * i / 4;
+        g += `<line x1="${pl}" x2="${W - pr}" y1="${Y(y)}" y2="${Y(y)}" class="gl"/><text x="${pl - 6}" y="${Y(y) + 4}" text-anchor="end" class="ax">${sh(y)}</text>`;
+        const x = xm * i / 4;
+        g += `<text x="${X(x)}" y="${H - 6}" text-anchor="${i == 0 ? 'start' : i == 4 ? 'end' : 'middle'}" class="ax">${+x.toFixed(1)}${I18N[curLang].yrSuffix}</text>`;
       }
-      requestAnimationFrame(tick)
+      $('#cs').setAttribute('viewBox', `0 0 ${W} ${H}`);
+      $('#cs').innerHTML = `<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--b);stop-opacity:.5"/><stop offset="1" style="stop-color:var(--b);stop-opacity:0"/></linearGradient></defs>${g}<path d="${ln(1)}L${pts[pts.length - 1][0]} ${Y(0)}L${pl} ${Y(0)}Z" fill="url(#ag)" class="${first ? 'fade' : ''}"/><path d="${ln(2)}" class="l2 ${first ? 'fade' : ''}"/><path d="${ln(1)}" pathLength="1" class="l1${first ? ' draw' : ''}"/><line id="hl" y1="${pt}" y2="${H - pb}" class="hl"/><circle id="hd" r="5" class="hd"/>`;
     }
-    rs(); tick(); build();
+
+    $('#cs').addEventListener('pointermove', e => {
+      if (!pts.length) return;
+      const r = e.currentTarget.getBoundingClientRect(), x = e.clientX - r.left;
+      let b = pts[0];
+      pts.forEach(p => { if (Math.abs(p[0] - x) < Math.abs(b[0] - x)) b = p });
+      const h = $('#hl'), d = $('#hd'), t = $('#tip');
+      h.setAttribute('x1', b[0]); h.setAttribute('x2', b[0]); h.style.opacity = 1;
+      d.setAttribute('cx', b[0]); d.setAttribute('cy', b[1]); d.style.opacity = 1;
+      t.innerHTML = `${I18N[curLang].yearTip} ${+b[3].x.toFixed(1)}<br>${last.l2}: <b>${f(b[3].b)}</b><br>${last.l1}: ${f(b[3].a)}`;
+      t.style.opacity = 1;
+      t.style.left = Math.min(Math.max(b[0] - 60, 0), Math.max(0, r.width - 150)) + 'px';
+    });
+
+    $('#cs').addEventListener('pointerleave', () => {
+      const h = $('#hl'), d = $('#hd');
+      if (h) { h.style.opacity = 0; d.style.opacity = 0 }
+      $('#tip').style.opacity = 0;
+    });
+
+    $('#flds').addEventListener('input', e => {
+      const t = e.target, j = t.dataset.j;
+      if (j == null) return;
+      const F = CALCS[ci].F[j];
+      let v = parseFloat(t.value);
+      if (isNaN(v)) return;
+      v = Math.min(F.max, Math.max(F.min, v));
+      F.v = v;
+      if (t.type == 'range') { $('#n' + j).value = v } else { const r = $('#r' + j); r.value = v }
+      fill($('#r' + j));
+      run();
+    });
+
+    $('#flds').addEventListener('change', e => {
+      const j = e.target.dataset.j;
+      if (j != null && e.target.type == 'number') e.target.value = CALCS[ci].F[j].v;
+    });
+
+    $('#flds').addEventListener('click', e => {
+      const b = e.target.closest('.seg button');
+      if (!b) return;
+      CALCS[ci].F[b.parentNode.dataset.j].v = +b.dataset.q;
+      [...b.parentNode.children].forEach(x => x.classList.toggle('on', x == b));
+      run();
+    });
+
+    function setLang(lang) {
+      curLang = lang;
+      localStorage.setItem('finverse_lang', lang);
+      document.documentElement.lang = lang;
+      const t = I18N[curLang];
+      document.title = t.pageTitle;
+      $('#hero-title').innerHTML = t.heroTitle;
+      $('#hero-sub').textContent = t.heroSub;
+      $('#ft-copy').textContent = t.ftCopy;
+      $('#ft-disc').textContent = t.ftDisc;
+      $('#cur').setAttribute('aria-label', t.currencyLabel);
+      $('#th').setAttribute('aria-label', t.themeLabel);
+      $('#lang').setAttribute('aria-label', t.langLabel);
+      $('#lang').value = curLang;
+
+      $('#tabs').innerHTML = CALCS.map((c, j) => `<button class="tab${j == ci ? ' on' : ''}" data-j="${j}"><span>${c.ic}</span>${typeof c.n === 'object' ? c.n[curLang] : c.n}</button>`).join('');
+
+      const iv = $('#iv');
+      if (iv.dataset.b) {
+        delete iv.dataset.b;
+      }
+
+      build();
+
+      if (cm && $('#md')) {
+        const curN = cm.p[2];
+        const prevV = Object.assign({}, cm.v);
+        closeCalc();
+        openCalc(curN);
+        if (cm) {
+          cm.v = prevV;
+          cm.m.F.forEach((x, j) => {
+            const val = cm.v[x[0]];
+            if (val != null) {
+              const numInput = $('#mn' + j);
+              const rngInput = $('#mr' + j);
+              if (numInput) numInput.value = val;
+              if (rngInput) { rngInput.value = val; fill(rngInput); }
+            }
+          });
+          mRun();
+        }
+      }
+    }
+
+    $('#tabs').addEventListener('click', e => {
+      const b = e.target.closest('.tab');
+      if (!b) return;
+      ci = +b.dataset.j;
+      document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x == b));
+      b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+      build();
+    });
+
+    $('#cur').innerHTML = CURS.map((c, i) => `<option value="${i}">${c[0]} ${c[1].trim()}</option>`).join('');
+    $('#cur').addEventListener('change', e => {
+      S = CURS[e.target.value][1];
+      L = CURS[e.target.value][2];
+      build();
+    });
+
+    $('#lang').addEventListener('change', e => {
+      setLang(e.target.value);
+    });
+
+    $('#th').addEventListener('click', () => {
+      const r = document.documentElement, dk = r.dataset.theme ? r.dataset.theme == 'dark' : matchMedia('(prefers-color-scheme:dark)').matches;
+      r.dataset.theme = dk ? 'light' : 'dark';
+    });
+
+    document.addEventListener('pointermove', e => {
+      const g = e.target.closest && e.target.closest('.glass');
+      if (!g) return;
+      const r = g.getBoundingClientRect();
+      g.style.setProperty('--mx', e.clientX - r.left + 'px');
+      g.style.setProperty('--my', e.clientY - r.top + 'px');
+    });
+
+    let rt;
+    addEventListener('resize', () => {
+      clearTimeout(rt);
+      rt = setTimeout(() => { chart(false); rs() }, 150);
+    });
+
+    /* particle field */
+    const cv = $('#fx'), cx = cv.getContext('2d');
+    let P = [], W0, H0, mx = -999, my = -999, fr = 0, dc = '150,160,255';
+    function rs() {
+      const d = Math.min(devicePixelRatio || 1, 2);
+      W0 = innerWidth; H0 = innerHeight;
+      cv.width = W0 * d; cv.height = H0 * d;
+      cx.setTransform(d, 0, 0, d, 0, 0);
+      P = Array.from({ length: Math.min(70, Math.round(W0 * H0 / 20000)) }, () => ({
+        x: Math.random() * W0, y: Math.random() * H0,
+        vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45
+      }));
+    }
+    addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY });
+
+    function tick() {
+      if (fr++ % 40 == 0) dc = getComputedStyle(document.documentElement).getPropertyValue('--dot').trim() || dc;
+      cx.clearRect(0, 0, W0, H0);
+      for (const p of P) {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > W0) p.vx *= -1;
+        if (p.y < 0 || p.y > H0) p.vy *= -1;
+        cx.fillStyle = `rgba(${dc},.7)`;
+        cx.beginPath(); cx.arc(p.x, p.y, 1.8, 0, 7); cx.fill();
+      }
+      for (let i = 0; i < P.length; i++) {
+        for (let j = i + 1; j < P.length; j++) {
+          const d = Math.hypot(P[i].x - P[j].x, P[i].y - P[j].y);
+          if (d < 110) {
+            cx.strokeStyle = `rgba(${dc},${.22 * (1 - d / 110)})`;
+            cx.beginPath(); cx.moveTo(P[i].x, P[i].y); cx.lineTo(P[j].x, P[j].y); cx.stroke();
+          }
+        }
+        const d = Math.hypot(P[i].x - mx, P[i].y - my);
+        if (d < 150) {
+          cx.strokeStyle = `rgba(${dc},${.5 * (1 - d / 150)})`;
+          cx.beginPath(); cx.moveTo(P[i].x, P[i].y); cx.lineTo(mx, my); cx.stroke();
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+
+    rs(); tick(); setLang(curLang);
   </script>
 </body>
 

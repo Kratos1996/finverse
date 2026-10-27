@@ -36,6 +36,7 @@
   - US Dollar (`$` USD)
   - Euro (`€` EUR)
   - UAE Dirham (`AED` AED)
+- **🗣️ Multi-Language Support**: Seamless on-the-fly language switching between **English** and **Hindi (हिन्दी)** with persistent preferences, Hindi localized terms, and Devanagari typography (`Noto Sans Devanagari`).
 - **🌓 Theme Support**: Instant dark/light mode toggle with native `prefers-color-scheme` detection.
 - **🎨 Modern Glassmorphic Design**:
   - Animated floating gradient blur orbs.
