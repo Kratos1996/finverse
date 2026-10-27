@@ -1,202 +1,1150 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Finverse · Smart Money Calculators</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-<style>
-*{box-sizing:border-box;margin:0}
-:root{--bg:#f3f5ff;--fg:#12142b;--mut:#5b6088;--card:rgba(255,255,255,.66);--bd:rgba(80,90,200,.18);--a:#6d5dfc;--b:#00b89f;--c:#ff5fa2;--dot:90,100,220;--blob:.32;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#07081a;--fg:#eef0ff;--mut:#9aa0d0;--card:rgba(20,22,52,.55);--bd:rgba(150,160,255,.16);--a:#8b7bff;--b:#2ee6c5;--c:#ff6fb1;--dot:150,160,255;--blob:.5;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#07081a;--fg:#eef0ff;--mut:#9aa0d0;--card:rgba(20,22,52,.55);--bd:rgba(150,160,255,.16);--a:#8b7bff;--b:#2ee6c5;--c:#ff6fb1;--dot:150,160,255;--blob:.5;color-scheme:dark}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{background:var(--bg);color:var(--fg);font:15px/1.5 Inter,system-ui,-apple-system,sans-serif;min-height:100vh;overflow-x:hidden;transition:background .4s}
-.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-.blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:var(--blob);animation:fl 18s ease-in-out infinite alternate}
-.b1{width:46vmax;height:46vmax;background:var(--a);top:-12vmax;left:-10vmax}
-.b2{width:40vmax;height:40vmax;background:var(--b);right:-12vmax;top:20vh;animation-duration:23s}
-.b3{width:44vmax;height:44vmax;background:var(--c);bottom:-18vmax;left:25vw;animation-duration:27s}
-@keyframes fl{to{transform:translate(8vw,6vh) scale(1.25) rotate(25deg)}}
-#fx{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
-.wrap{position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:16px 16px 36px}
-.top{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.logo{font:700 21px 'Space Grotesk',sans-serif;display:flex;gap:10px;align-items:center}
-.logo i{width:30px;height:30px;border-radius:10px;background:conic-gradient(var(--a),var(--b),var(--c),var(--a));animation:sp 6s linear infinite;box-shadow:0 0 24px -2px var(--a)}
-@keyframes sp{to{transform:rotate(360deg)}}
-.ctl{display:flex;gap:8px}
-select,.pill{background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:12px;padding:8px 12px;font:600 13px Inter,sans-serif;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);cursor:pointer}
-h1{font:700 clamp(34px,8vw,66px)/1.05 'Space Grotesk',sans-serif;margin:28px 0 10px;letter-spacing:-.02em;animation:up .7s both}
-.gt{background:linear-gradient(90deg,var(--a),var(--b),var(--c),var(--a));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:gs 6s linear infinite}
-@keyframes gs{to{background-position:300% 0}}
-.sub{color:var(--mut);max-width:560px;animation:up .7s .1s both}
-.tabs{display:flex;gap:8px;overflow-x:auto;padding:18px 2px 10px;scrollbar-width:none;animation:up .7s .2s both}
-.tabs::-webkit-scrollbar{display:none}
-.tab{flex:none;display:flex;gap:6px;align-items:center;border:1px solid var(--bd);background:var(--card);color:var(--fg);padding:10px 16px;border-radius:99px;font:600 14px Inter,sans-serif;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:transform .25s,box-shadow .25s}
-.tab:hover{transform:translateY(-3px)}
-.tab.on{background:linear-gradient(135deg,var(--a),var(--c));color:#fff;border-color:transparent;box-shadow:0 10px 26px -8px var(--a)}
-.grid{display:grid;grid-template-columns:1fr;gap:16px;margin-top:6px}
-@media(min-width:860px){.grid{grid-template-columns:400px 1fr}}
-.glass{position:relative;background:var(--card);border:1px solid var(--bd);border-radius:24px;padding:22px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);overflow:hidden;animation:up .7s .3s both;min-width:0}
-.glass::before{content:"";position:absolute;inset:0;background:radial-gradient(300px circle at var(--mx,50%) var(--my,0%),rgba(var(--dot),.2),transparent 60%);pointer-events:none}
-@keyframes up{from{opacity:0;transform:translateY(26px)}}
-h2{font:700 24px 'Space Grotesk',sans-serif}
-.mut{color:var(--mut);font-size:13px}
-.f{margin:20px 0 4px}
-.r{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.f label{color:var(--mut);font-size:13px}
-.num{display:flex;align-items:center;gap:3px;background:rgba(var(--dot),.1);border:1px solid var(--bd);border-radius:10px;padding:4px 10px;font:600 14px 'Space Grotesk',sans-serif;color:var(--mut)}
-.num input{width:92px;background:none;border:0;color:var(--fg);font:600 15px 'Space Grotesk',sans-serif;text-align:right;outline:0;-moz-appearance:textfield}
-.num input::-webkit-inner-spin-button{-webkit-appearance:none}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:9px;margin-top:14px;background:linear-gradient(90deg,var(--a) var(--p,50%),rgba(var(--dot),.2) var(--p,50%));outline:0;display:block}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:5px solid var(--a);box-shadow:0 4px 14px rgba(var(--dot),.5);cursor:pointer;transition:transform .15s}
-input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:5px solid var(--a);cursor:pointer}
-input[type=range]:active::-webkit-slider-thumb{transform:scale(1.3)}
-.seg{display:flex;background:rgba(var(--dot),.1);border-radius:12px;padding:4px;margin-top:8px;gap:4px}
-.seg button{flex:1;border:0;background:none;color:var(--mut);padding:8px 4px;border-radius:9px;font:600 13px Inter,sans-serif;cursor:pointer;transition:.25s}
-.seg .on{background:var(--a);color:#fff;box-shadow:0 6px 16px -6px var(--a)}
-.hero{text-align:center;padding:4px 0}
-.hero small{color:var(--mut);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
-.big{font:700 clamp(36px,9vw,56px)/1.15 'Space Grotesk',sans-serif;background:linear-gradient(90deg,var(--b),var(--a),var(--c));-webkit-background-clip:text;background-clip:text;color:transparent;word-break:break-all}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:16px 0}
-.st{padding:12px 14px;border-radius:16px;background:rgba(var(--dot),.08);border:1px solid var(--bd);transition:transform .25s}
-.st:hover{transform:translateY(-3px) scale(1.02)}
-.st small{color:var(--mut);display:block;font-size:12px}
-.st b{font:600 17px 'Space Grotesk',sans-serif;word-break:break-all}
-.viz{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:center}
-@media(max-width:560px){.viz{grid-template-columns:1fr;justify-items:center}}
-.donut{width:150px;height:150px}
-.donut circle{fill:none;stroke-width:16}
-#da{transition:stroke-dasharray .8s cubic-bezier(.2,.9,.3,1)}
-.dt{fill:var(--fg);font:700 24px 'Space Grotesk',sans-serif;text-anchor:middle}
-.ds{fill:var(--mut);font:11px Inter,sans-serif;text-anchor:middle}
-.lg{display:flex;align-items:center;gap:8px;font-size:14px;margin:6px 0;flex-wrap:wrap}
-.lg i,.cl i{width:11px;height:11px;border-radius:4px;display:inline-block;margin-right:6px}
-.lg b{margin-left:auto;font-family:'Space Grotesk',sans-serif}
-.chart{position:relative;margin-top:18px}
-.cl{font-size:12px;color:var(--mut);display:flex;gap:16px;margin-bottom:6px}
-#cs{width:100%;display:block;touch-action:pan-y}
-.gl{stroke:rgba(var(--dot),.15)}
-.ax{fill:var(--mut);font:11px Inter,sans-serif}
-.l1{fill:none;stroke:var(--b);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
-.l2{fill:none;stroke:var(--a);stroke-width:2;stroke-dasharray:5 5}
-.draw{stroke-dasharray:1;stroke-dashoffset:1;animation:dr 1.4s ease forwards}
-@keyframes dr{to{stroke-dashoffset:0}}
-.fade{animation:fd 1.6s both}
-@keyframes fd{from{opacity:0}}
-.hl{stroke:var(--mut);stroke-dasharray:3 3;opacity:0}
-.hd{fill:var(--b);stroke:var(--bg);stroke-width:2;opacity:0}
-.tip{position:absolute;top:22px;pointer-events:none;background:var(--bg);border:1px solid var(--bd);padding:6px 10px;border-radius:10px;font-size:12px;opacity:0;transition:opacity .15s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.2)}
-.foot{text-align:center;color:var(--mut);font-size:12px;margin-top:12px}
-.cp{margin-top:26px;text-align:center;animation-delay:.6s}
-.cn{font:700 16px 'Space Grotesk',sans-serif}
-.cl2{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:12px}
-.cl2 a{color:var(--fg);text-decoration:none;border:1px solid var(--bd);background:rgba(var(--dot),.1);padding:8px 14px;border-radius:99px;font-size:13px;font-weight:600;transition:transform .25s,box-shadow .25s}
-.cl2 a:hover{transform:translateY(-3px);box-shadow:0 10px 22px -10px var(--a)}
-@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Finverse · Smart Money Calculators</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0
+    }
+
+    :root {
+      --bg: #f3f5ff;
+      --fg: #12142b;
+      --mut: #5b6088;
+      --card: rgba(255, 255, 255, .66);
+      --bd: rgba(80, 90, 200, .18);
+      --a: #6d5dfc;
+      --b: #00b89f;
+      --c: #ff5fa2;
+      --dot: 90, 100, 220;
+      --blob: .32;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    @media(prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #07081a;
+        --fg: #eef0ff;
+        --mut: #9aa0d0;
+        --card: rgba(20, 22, 52, .55);
+        --bd: rgba(150, 160, 255, .16);
+        --a: #8b7bff;
+        --b: #2ee6c5;
+        --c: #ff6fb1;
+        --dot: 150, 160, 255;
+        --blob: .5;
+        color-scheme: dark
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #07081a;
+      --fg: #eef0ff;
+      --mut: #9aa0d0;
+      --card: rgba(20, 22, 52, .55);
+      --bd: rgba(150, 160, 255, .16);
+      --a: #8b7bff;
+      --b: #2ee6c5;
+      --c: #ff6fb1;
+      --dot: 150, 160, 255;
+      --blob: .5;
+      color-scheme: dark
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font: 15px/1.5 Inter, system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background .4s
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: var(--blob);
+      animation: fl 18s ease-in-out infinite alternate
+    }
+
+    .b1 {
+      width: 46vmax;
+      height: 46vmax;
+      background: var(--a);
+      top: -12vmax;
+      left: -10vmax
+    }
+
+    .b2 {
+      width: 40vmax;
+      height: 40vmax;
+      background: var(--b);
+      right: -12vmax;
+      top: 20vh;
+      animation-duration: 23s
+    }
+
+    .b3 {
+      width: 44vmax;
+      height: 44vmax;
+      background: var(--c);
+      bottom: -18vmax;
+      left: 25vw;
+      animation-duration: 27s
+    }
+
+    @keyframes fl {
+      to {
+        transform: translate(8vw, 6vh) scale(1.25) rotate(25deg)
+      }
+    }
+
+    #fx {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 2;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px 16px 36px
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px
+    }
+
+    .logo {
+      font: 700 21px 'Space Grotesk', sans-serif;
+      display: flex;
+      gap: 10px;
+      align-items: center
+    }
+
+    .logo i {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: conic-gradient(var(--a), var(--b), var(--c), var(--a));
+      animation: sp 6s linear infinite;
+      box-shadow: 0 0 24px -2px var(--a)
+    }
+
+    @keyframes sp {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .ctl {
+      display: flex;
+      gap: 8px
+    }
+
+    select,
+    .pill {
+      background: var(--card);
+      color: var(--fg);
+      border: 1px solid var(--bd);
+      border-radius: 12px;
+      padding: 8px 12px;
+      font: 600 13px Inter, sans-serif;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      cursor: pointer
+    }
+
+    h1 {
+      font: 700 clamp(34px, 8vw, 66px)/1.05 'Space Grotesk', sans-serif;
+      margin: 28px 0 10px;
+      letter-spacing: -.02em;
+      animation: up .7s both
+    }
+
+    .gt {
+      background: linear-gradient(90deg, var(--a), var(--b), var(--c), var(--a));
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: gs 6s linear infinite
+    }
+
+    @keyframes gs {
+      to {
+        background-position: 300% 0
+      }
+    }
+
+    .sub {
+      color: var(--mut);
+      max-width: 560px;
+      animation: up .7s .1s both
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 18px 2px 10px;
+      scrollbar-width: none;
+      animation: up .7s .2s both
+    }
+
+    .tabs::-webkit-scrollbar {
+      display: none
+    }
+
+    .tab {
+      flex: none;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      border: 1px solid var(--bd);
+      background: var(--card);
+      color: var(--fg);
+      padding: 10px 16px;
+      border-radius: 99px;
+      font: 600 14px Inter, sans-serif;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: transform .25s, box-shadow .25s
+    }
+
+    .tab:hover {
+      transform: translateY(-3px)
+    }
+
+    .tab.on {
+      background: linear-gradient(135deg, var(--a), var(--c));
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 10px 26px -8px var(--a)
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 6px
+    }
+
+    @media(min-width:860px) {
+      .grid {
+        grid-template-columns: 400px 1fr
+      }
+    }
+
+    .glass {
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--bd);
+      border-radius: 24px;
+      padding: 22px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      overflow: hidden;
+      animation: up .7s .3s both;
+      min-width: 0
+    }
+
+    .glass::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 0%), rgba(var(--dot), .2), transparent 60%);
+      pointer-events: none
+    }
+
+    @keyframes up {
+      from {
+        opacity: 0;
+        transform: translateY(26px)
+      }
+    }
+
+    h2 {
+      font: 700 24px 'Space Grotesk', sans-serif
+    }
+
+    .mut {
+      color: var(--mut);
+      font-size: 13px
+    }
+
+    .f {
+      margin: 20px 0 4px
+    }
+
+    .r {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px
+    }
+
+    .f label {
+      color: var(--mut);
+      font-size: 13px
+    }
+
+    .num {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      background: rgba(var(--dot), .1);
+      border: 1px solid var(--bd);
+      border-radius: 10px;
+      padding: 4px 10px;
+      font: 600 14px 'Space Grotesk', sans-serif;
+      color: var(--mut)
+    }
+
+    .num input {
+      width: 92px;
+      background: none;
+      border: 0;
+      color: var(--fg);
+      font: 600 15px 'Space Grotesk', sans-serif;
+      text-align: right;
+      outline: 0;
+      -moz-appearance: textfield
+    }
+
+    .num input::-webkit-inner-spin-button {
+      -webkit-appearance: none
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 9px;
+      margin-top: 14px;
+      background: linear-gradient(90deg, var(--a) var(--p, 50%), rgba(var(--dot), .2) var(--p, 50%));
+      outline: 0;
+      display: block
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      border: 5px solid var(--a);
+      box-shadow: 0 4px 14px rgba(var(--dot), .5);
+      cursor: pointer;
+      transition: transform .15s
+    }
+
+    input[type=range]::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      border: 5px solid var(--a);
+      cursor: pointer
+    }
+
+    input[type=range]:active::-webkit-slider-thumb {
+      transform: scale(1.3)
+    }
+
+    .seg {
+      display: flex;
+      background: rgba(var(--dot), .1);
+      border-radius: 12px;
+      padding: 4px;
+      margin-top: 8px;
+      gap: 4px
+    }
+
+    .seg button {
+      flex: 1;
+      border: 0;
+      background: none;
+      color: var(--mut);
+      padding: 8px 4px;
+      border-radius: 9px;
+      font: 600 13px Inter, sans-serif;
+      cursor: pointer;
+      transition: .25s
+    }
+
+    .seg .on {
+      background: var(--a);
+      color: #fff;
+      box-shadow: 0 6px 16px -6px var(--a)
+    }
+
+    .hero {
+      text-align: center;
+      padding: 4px 0
+    }
+
+    .hero small {
+      color: var(--mut);
+      font-size: 13px;
+      letter-spacing: .06em;
+      text-transform: uppercase
+    }
+
+    .big {
+      font: 700 clamp(36px, 9vw, 56px)/1.15 'Space Grotesk', sans-serif;
+      background: linear-gradient(90deg, var(--b), var(--a), var(--c));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      word-break: break-all
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin: 16px 0
+    }
+
+    .st {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(var(--dot), .08);
+      border: 1px solid var(--bd);
+      transition: transform .25s
+    }
+
+    .st:hover {
+      transform: translateY(-3px) scale(1.02)
+    }
+
+    .st small {
+      color: var(--mut);
+      display: block;
+      font-size: 12px
+    }
+
+    .st b {
+      font: 600 17px 'Space Grotesk', sans-serif;
+      word-break: break-all
+    }
+
+    .viz {
+      display: grid;
+      grid-template-columns: 150px 1fr;
+      gap: 16px;
+      align-items: center
+    }
+
+    @media(max-width:560px) {
+      .viz {
+        grid-template-columns: 1fr;
+        justify-items: center
+      }
+    }
+
+    .donut {
+      width: 150px;
+      height: 150px
+    }
+
+    .donut circle {
+      fill: none;
+      stroke-width: 16
+    }
+
+    #da {
+      transition: stroke-dasharray .8s cubic-bezier(.2, .9, .3, 1)
+    }
+
+    .dt {
+      fill: var(--fg);
+      font: 700 24px 'Space Grotesk', sans-serif;
+      text-anchor: middle
+    }
+
+    .ds {
+      fill: var(--mut);
+      font: 11px Inter, sans-serif;
+      text-anchor: middle
+    }
+
+    .lg {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      margin: 6px 0;
+      flex-wrap: wrap
+    }
+
+    .lg i,
+    .cl i {
+      width: 11px;
+      height: 11px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-right: 6px
+    }
+
+    .lg b {
+      margin-left: auto;
+      font-family: 'Space Grotesk', sans-serif
+    }
+
+    .chart {
+      position: relative;
+      margin-top: 18px
+    }
+
+    .cl {
+      font-size: 12px;
+      color: var(--mut);
+      display: flex;
+      gap: 16px;
+      margin-bottom: 6px
+    }
+
+    #cs {
+      width: 100%;
+      display: block;
+      touch-action: pan-y
+    }
+
+    .gl {
+      stroke: rgba(var(--dot), .15)
+    }
+
+    .ax {
+      fill: var(--mut);
+      font: 11px Inter, sans-serif
+    }
+
+    .l1 {
+      fill: none;
+      stroke: var(--b);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round
+    }
+
+    .l2 {
+      fill: none;
+      stroke: var(--a);
+      stroke-width: 2;
+      stroke-dasharray: 5 5
+    }
+
+    .draw {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: dr 1.4s ease forwards
+    }
+
+    @keyframes dr {
+      to {
+        stroke-dashoffset: 0
+      }
+    }
+
+    .fade {
+      animation: fd 1.6s both
+    }
+
+    @keyframes fd {
+      from {
+        opacity: 0
+      }
+    }
+
+    .hl {
+      stroke: var(--mut);
+      stroke-dasharray: 3 3;
+      opacity: 0
+    }
+
+    .hd {
+      fill: var(--b);
+      stroke: var(--bg);
+      stroke-width: 2;
+      opacity: 0
+    }
+
+    .tip {
+      position: absolute;
+      top: 22px;
+      pointer-events: none;
+      background: var(--bg);
+      border: 1px solid var(--bd);
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity .15s;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .2)
+    }
+
+    .foot {
+      text-align: center;
+      color: var(--mut);
+      font-size: 12px;
+      margin-top: 12px
+    }
+
+    .cp {
+      margin-top: 26px;
+      text-align: center;
+      animation-delay: .6s
+    }
+
+    .cn {
+      font: 700 16px 'Space Grotesk', sans-serif
+    }
+
+    .cl2 {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 12px
+    }
+
+    .cl2 a {
+      color: var(--fg);
+      text-decoration: none;
+      border: 1px solid var(--bd);
+      background: rgba(var(--dot), .1);
+      padding: 8px 14px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: transform .25s, box-shadow .25s
+    }
+
+    .cl2 a:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 22px -10px var(--a)
+    }
+
+    [hidden] {
+      display: none !important
+    }
+
+    .ih {
+      margin-top: 6px
+    }
+
+    .is {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 14px 0
+    }
+
+    .is span {
+      padding: 6px 12px;
+      border-radius: 99px;
+      background: rgba(var(--dot), .1);
+      border: 1px solid var(--bd);
+      font-size: 13px
+    }
+
+    .is b {
+      font: 700 15px 'Space Grotesk', sans-serif
+    }
+
+    .ich {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 14px 0
+    }
+
+    .ic {
+      border: 1px solid var(--bd);
+      background: rgba(var(--dot), .08);
+      color: var(--fg);
+      padding: 8px 12px;
+      border-radius: 99px;
+      font: 600 13px Inter, sans-serif;
+      cursor: pointer;
+      transition: .25s
+    }
+
+    .ic i {
+      font-style: normal;
+      opacity: .65;
+      margin-left: 4px
+    }
+
+    .ic:hover {
+      transform: translateY(-2px)
+    }
+
+    .ic.on {
+      background: var(--cc, var(--a));
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 8px 20px -8px var(--cc, var(--a))
+    }
+
+    #isq {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--bd);
+      background: rgba(var(--dot), .08);
+      color: var(--fg);
+      font: 500 14px Inter, sans-serif;
+      outline: 0
+    }
+
+    .ig {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 16px
+    }
+
+    .pc {
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--bd);
+      border-radius: 20px;
+      padding: 18px 16px 14px;
+      overflow: hidden;
+      animation: up .5s calc(var(--i)*40ms) both;
+      transition: transform .3s, box-shadow .3s;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .pc::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 4px;
+      background: var(--cc)
+    }
+
+    .pc:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 18px 36px -18px var(--cc)
+    }
+
+    .pt {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600
+    }
+
+    .pt span {
+      color: var(--cc);
+      background: rgba(var(--dot), .1);
+      padding: 3px 9px;
+      border-radius: 99px
+    }
+
+    .pt em {
+      font-style: normal;
+      color: var(--mut)
+    }
+
+    .pc h3 {
+      font: 700 18px 'Space Grotesk', sans-serif;
+      line-height: 1.25
+    }
+
+    .pc p {
+      color: var(--mut);
+      font-size: 14px;
+      flex: 1
+    }
+
+    .pf {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      font-size: 11px;
+      color: var(--mut);
+      border-top: 1px dashed var(--bd);
+      padding-top: 8px
+    }
+
+    .pf b {
+      color: var(--fg);
+      font-weight: 600;
+      background: rgba(var(--dot), .12);
+      padding: 2px 8px;
+      border-radius: 8px;
+      white-space: nowrap
+    }
+
+    .emp {
+      grid-column: 1/-1;
+      text-align: center;
+      color: var(--mut);
+      padding: 30px
+    }
+
+    .src {
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--mut)
+    }
+
+    .src a {
+      color: var(--a);
+      font-weight: 600
+    }
+
+    #md {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: rgba(5, 6, 20, .55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: fd .25s both
+    }
+
+    .mp {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow: auto;
+      background: var(--bg);
+      border: 1px solid var(--bd);
+      border-radius: 24px;
+      padding: 22px;
+      padding-bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+      animation: up .35s both;
+      box-shadow: 0 30px 80px -24px var(--cc)
+    }
+
+    .mp h2 {
+      margin: 10px 0 2px
+    }
+
+    .mx {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      border: 1px solid var(--bd);
+      background: var(--card);
+      color: var(--fg);
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 14px
+    }
+
+    .cb {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: linear-gradient(135deg, var(--cc), var(--a));
+      color: #fff;
+      font: 600 13px Inter, sans-serif;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+      margin-top: 4px
+    }
+
+    .cb:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px -10px var(--cc)
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      * {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="bg"><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i></div>
-<canvas id="fx"></canvas>
-<div class="wrap">
-  <div class="top">
-    <div class="logo"><i></i>Finverse</div>
-    <div class="ctl"><select id="cur" aria-label="Currency"></select><button class="pill" id="th" aria-label="Toggle theme">◐</button></div>
+  <div class="bg"><i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i></div>
+  <canvas id="fx"></canvas>
+  <div class="wrap">
+    <div class="top">
+      <div class="logo"><i></i>Finverse</div>
+      <div class="ctl"><select id="cur" aria-label="Currency"></select><button class="pill" id="th"
+          aria-label="Toggle theme">◐</button></div>
+    </div>
+    <h1>Money maths,<br><span class="gt">made magical.</span></h1>
+    <p class="sub">Seven calculators for investing, saving, borrowing and lending, plus a plain-English guide to every
+      live LIC insurance plan. Drag a slider and watch the numbers come alive.</p>
+    <nav class="tabs" id="tabs"></nav>
+    <div class="grid" id="cv">
+      <section class="glass">
+        <h2 id="ttl"></h2>
+        <p class="mut" id="dsc"></p>
+        <div id="flds"></div>
+      </section>
+      <section class="glass" style="animation-delay:.4s">
+        <div class="hero"><small id="bl"></small>
+          <div class="big" id="big">0</div>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="viz">
+          <svg class="donut" viewBox="0 0 140 140">
+            <g transform="rotate(-90 70 70)">
+              <circle cx="70" cy="70" r="54" style="stroke:var(--c)" />
+              <circle id="da" cx="70" cy="70" r="54" style="stroke:var(--a)" stroke-dasharray="0 340" />
+            </g><text class="dt" x="70" y="72" id="dp">0%</text><text class="ds" x="70" y="90" id="ds"></text>
+          </svg>
+          <div id="lg"></div>
+        </div>
+        <div class="chart" id="chart">
+          <div class="cl" id="cl"></div><svg id="cs"></svg>
+          <div class="tip" id="tip"></div>
+        </div>
+      </section>
+    </div>
+    <section id="iv" hidden></section>
+    <footer class="glass cp">
+      <div class="cn">© 2026 Prem Sagar Sharma. All rights reserved.</div>
+      <div class="cl2"><a href="tel:+919950006100">📞 +91-9950006100</a><a
+          href="mailto:prem.sagar.sharma68@gmail.com">✉️ prem.sagar.sharma68@gmail.com</a></div>
+      <p class="foot">Estimates for illustration only · not financial advice · all maths runs in your browser</p>
+    </footer>
   </div>
-  <h1>Money maths,<br><span class="gt">made magical.</span></h1>
-  <p class="sub">Seven live calculators for investing, saving, borrowing and lending. Drag a slider and watch the numbers come alive.</p>
-  <nav class="tabs" id="tabs"></nav>
-  <div class="grid">
-    <section class="glass"><h2 id="ttl"></h2><p class="mut" id="dsc"></p><div id="flds"></div></section>
-    <section class="glass" style="animation-delay:.4s">
-      <div class="hero"><small id="bl"></small><div class="big" id="big">0</div></div>
-      <div class="stats" id="stats"></div>
-      <div class="viz">
-        <svg class="donut" viewBox="0 0 140 140"><g transform="rotate(-90 70 70)"><circle cx="70" cy="70" r="54" style="stroke:var(--c)"/><circle id="da" cx="70" cy="70" r="54" style="stroke:var(--a)" stroke-dasharray="0 340"/></g><text class="dt" x="70" y="72" id="dp">0%</text><text class="ds" x="70" y="90" id="ds"></text></svg>
-        <div id="lg"></div>
-      </div>
-      <div class="chart" id="chart"><div class="cl" id="cl"></div><svg id="cs"></svg><div class="tip" id="tip"></div></div>
-    </section>
-  </div>
-  <footer class="glass cp"><div class="cn">© 2026 Ishant Sharma. All rights reserved.</div><div class="cl2"><a href="tel:+917732993378">📞 +91-7732993378</a><a href="mailto:ishant.sharma1947@gmail.com">✉️ ishant.sharma1947@gmail.com</a></div><p class="foot">Estimates for illustration only · not financial advice · all maths runs in your browser</p></footer>
-</div>
-<script>
-const $=s=>document.querySelector(s),C=2*Math.PI*54;
-const CURS=[['INR','₹','en-IN'],['USD','$','en-US'],['EUR','€','en-IE'],['AED','AED ','en-US']];
-let ci=0,S='₹',L='en-IN',last=null,pts=[];
-const f=n=>S+Math.round(n).toLocaleString(L),sh=n=>new Intl.NumberFormat(L,{notation:'compact',maximumFractionDigits:1}).format(n);
-const rdFV=(p,r,m)=>{let s=0;for(let k=1;k<=m;k++)s+=p*Math.pow(1+r/400,4*(m-k+1)/12);return s};
-const CALCS=[
-{n:'SIP',ic:'📈',d:'Build wealth with disciplined monthly investing.',
- F:[{k:'p',l:'Monthly investment',min:500,max:200000,st:500,v:25000,u:'c'},{k:'r',l:'Expected return (p.a.)',min:1,max:30,st:.1,v:12,u:'%'},{k:'y',l:'Time period',min:1,max:40,st:1,v:10,u:'yrs'},{k:'s',l:'Annual step-up',min:0,max:25,st:1,v:0,u:'%'}],
- run(v){let i=v.r/1200,b=0,inv=0,c=v.p,ser=[{x:0,a:0,b:0}];for(let m=1;m<=v.y*12;m++){b=(b+c)*(1+i);inv+=c;if(m%12==0){ser.push({x:m/12,a:inv,b});c*=1+v.s/100}}
-  return{main:['Future value',b],st:[['Invested',inv],['Est. returns',b-inv],['Wealth gain',inv?(b-inv)/inv*100:0,1]],a:inv,g:b-inv,la:'Invested',lg:'Returns',ser,l1:'Invested',l2:'Value'}}},
-{n:'Lumpsum',ic:'💎',d:'See what a one-time investment can become.',
- F:[{k:'p',l:'Total investment',min:10000,max:10000000,st:10000,v:500000,u:'c'},{k:'r',l:'Expected return (p.a.)',min:1,max:30,st:.1,v:12,u:'%'},{k:'y',l:'Time period',min:1,max:40,st:1,v:10,u:'yrs'}],
- run(v){const g=t=>v.p*Math.pow(1+v.r/100,t),fv=g(v.y);return{main:['Maturity value',fv],st:[['Invested',v.p],['Est. returns',fv-v.p],['Multiple',fv/v.p,2]],a:v.p,g:fv-v.p,la:'Invested',lg:'Returns',ser:Array.from({length:v.y+1},(_,t)=>({x:t,a:v.p,b:g(t)})),l1:'Invested',l2:'Value'}}},
-{n:'Loan EMI',ic:'🏠',d:'Home, car or personal loan, your monthly EMI at a glance.',
- F:[{k:'p',l:'Loan amount',min:100000,max:50000000,st:50000,v:2500000,u:'c'},{k:'r',l:'Interest rate (p.a.)',min:1,max:20,st:.05,v:8.5,u:'%'},{k:'y',l:'Loan tenure',min:1,max:30,st:1,v:20,u:'yrs'}],
- run(v){const i=v.r/1200,m=v.y*12,E=i?v.p*i*Math.pow(1+i,m)/(Math.pow(1+i,m)-1):v.p/m,tot=E*m;let bal=v.p;const ser=[{x:0,a:0,b:bal}];
-  for(let k=1;k<=m;k++){bal-=E-bal*i;if(k%12==0)ser.push({x:k/12,a:E*k,b:Math.max(0,bal)})}
-  return{main:['Monthly EMI',E],st:[['Principal',v.p],['Total interest',tot-v.p],['Total payment',tot]],a:v.p,g:tot-v.p,la:'Principal',lg:'Interest',ser,l1:'Paid so far',l2:'Balance'}}},
-{n:'RD',ic:'🏦',d:'Recurring deposit with quarterly compounding.',
- F:[{k:'p',l:'Monthly deposit',min:500,max:100000,st:500,v:10000,u:'c'},{k:'r',l:'Interest rate (p.a.)',min:1,max:12,st:.1,v:6.5,u:'%'},{k:'y',l:'Time period',min:1,max:10,st:1,v:5,u:'yrs'}],
- run(v){const fv=rdFV(v.p,v.r,v.y*12),inv=v.p*v.y*12;return{main:['Maturity amount',fv],st:[['Total deposited',inv],['Interest earned',fv-inv],['Effective yield',inv?(fv-inv)/inv*100:0,1]],a:inv,g:fv-inv,la:'Deposited',lg:'Interest',ser:Array.from({length:v.y+1},(_,t)=>({x:t,a:v.p*12*t,b:rdFV(v.p,v.r,t*12)})),l1:'Deposited',l2:'Value'}}},
-{n:'FD',ic:'🔒',d:'Fixed deposit maturity with your choice of compounding.',
- F:[{k:'p',l:'Deposit amount',min:10000,max:10000000,st:10000,v:500000,u:'c'},{k:'r',l:'Interest rate (p.a.)',min:1,max:12,st:.1,v:7,u:'%'},{k:'y',l:'Time period',min:1,max:25,st:1,v:5,u:'yrs'},{k:'q',l:'Compounding',seg:['Monthly','Quarterly','Yearly'],vals:[12,4,1],v:1}],
- run(v){const g=t=>v.p*Math.pow(1+v.r/(100*v.q),v.q*t),fv=g(v.y);return{main:['Maturity amount',fv],st:[['Deposited',v.p],['Interest earned',fv-v.p],['Total growth',(fv-v.p)/v.p*100,1]],a:v.p,g:fv-v.p,la:'Deposited',lg:'Interest',ser:Array.from({length:v.y+1},(_,t)=>({x:t,a:v.p,b:g(t)})),l1:'Deposited',l2:'Value'}}},
-{n:'Lend Money',ic:'🤝',d:'Interest earned when you lend, simple or compounded monthly.',
- F:[{k:'p',l:'Amount lent',min:1000,max:10000000,st:1000,v:100000,u:'c'},{k:'r',l:'Interest rate (p.a.)',min:.5,max:60,st:.5,v:18,u:'%'},{k:'y',l:'Duration',min:.5,max:20,st:.5,v:3,u:'yrs'},{k:'m',l:'Interest type',seg:['Simple','Compound'],vals:[0,1],v:0}],
- run(v){const g=t=>v.m?v.p*Math.pow(1+v.r/1200,12*t):v.p*(1+v.r*t/100),tot=g(v.y);return{main:['Total to receive',tot],st:[['Principal',v.p],['Interest earned',tot-v.p],['Avg. per month',(tot-v.p)/(v.y*12)]],a:v.p,g:tot-v.p,la:'Principal',lg:'Interest',ser:Array.from({length:11},(_,j)=>({x:v.y*j/10,a:v.p,b:g(v.y*j/10)})),l1:'Principal',l2:'Amount'}}},
-{n:'CAGR',ic:'🚀',d:'Find the annual growth rate between two values.',
- F:[{k:'i',l:'Initial value',min:1000,max:10000000,st:1000,v:100000,u:'c'},{k:'e',l:'Final value',min:1000,max:100000000,st:1000,v:250000,u:'c'},{k:'y',l:'Time period',min:1,max:40,st:1,v:5,u:'yrs'}],
- run(v){const c=Math.pow(v.e/v.i,1/v.y)-1;return{main:['CAGR',c*100,1],st:[['Initial',v.i],['Final',v.e],['Absolute return',(v.e-v.i)/v.i*100,1]],a:v.i,g:Math.max(0,v.e-v.i),la:'Initial',lg:'Growth',ser:Array.from({length:v.y+1},(_,t)=>({x:t,a:v.i,b:v.i*Math.pow(1+c,t)})),l1:'Initial',l2:'Value'}}}
-];
-function cnt(el,to,pct){const from=el._v||0;el._v=to;cancelAnimationFrame(el._r);const t0=performance.now();(function s(t){const k=Math.min(1,(t-t0)/650),e=1-Math.pow(1-k,3),v=from+(to-from)*e;el.textContent=pct?v.toFixed(2)+(pct==2?'×':'%'):f(v);if(k<1)el._r=requestAnimationFrame(s)})(t0)}
-const fill=r=>r.style.setProperty('--p',(r.value-r.min)/(r.max-r.min)*100+'%');
-function build(){const c=CALCS[ci];$('#ttl').textContent=c.n+' Calculator';$('#dsc').textContent=c.d;$('#big')._v=0;$('#stats').innerHTML='';
- $('#flds').innerHTML=c.F.map((x,j)=>x.seg?`<div class="f"><label>${x.l}</label><div class="seg" data-j="${j}">${x.seg.map((s,q)=>`<button data-q="${q}" class="${q==x.v?'on':''}">${s}</button>`).join('')}</div></div>`:
- `<div class="f"><div class="r"><label for="n${j}">${x.l}</label><div class="num"><span>${x.u=='c'?S.trim():''}</span><input id="n${j}" data-j="${j}" type="number" inputmode="decimal" min="${x.min}" max="${x.max}" step="${x.st}" value="${x.v}"><span>${x.u=='c'?'':x.u}</span></div></div><input id="r${j}" data-j="${j}" type="range" min="${x.min}" max="${x.max}" step="${x.st}" value="${x.v}"></div>`).join('');
- document.querySelectorAll('#flds input[type=range]').forEach(fill);run(true)}
-function run(first){const c=CALCS[ci],v={};c.F.forEach(x=>v[x.k]=x.seg?x.vals[x.v]:x.v);const r=last=c.run(v);
- $('#bl').textContent=r.main[0];cnt($('#big'),r.main[1],r.main[2]);
- const s=$('#stats');if(s.children.length!=r.st.length)s.innerHTML=r.st.map(()=>'<div class="st"><small></small><b>0</b></div>').join('');
- r.st.forEach((q,j)=>{const e=s.children[j];e.firstChild.textContent=q[0];cnt(e.lastChild,q[1],q[2])});
- const g=Math.max(0,r.g),T=r.a+g||1,pa=r.a/T;$('#da').style.strokeDasharray=`${C*pa} ${C}`;$('#dp').textContent=Math.round((1-pa)*100)+'%';$('#ds').textContent=r.lg.toLowerCase();
- $('#lg').innerHTML=`<div class="lg"><i style="background:var(--a)"></i>${r.la}<b>${f(r.a)}</b></div><div class="lg"><i style="background:var(--c)"></i>${r.lg}<b>${f(g)}</b></div>`;
- $('#cl').innerHTML=`<span><i style="background:var(--b)"></i>${r.l2}</span><span><i style="background:var(--a)"></i>${r.l1}</span>`;chart(first)}
-function chart(first){if(!last)return;const W=$('#chart').clientWidth||320,H=230,pl=46,pr=8,pt=10,pb=24,s=last.ser,xm=s[s.length-1].x||1,ym=Math.max(...s.map(p=>Math.max(p.a,p.b)))*1.08||1;
- const X=x=>pl+(W-pl-pr)*x/xm,Y=y=>H-pb-(H-pt-pb)*y/ym;pts=s.map(p=>[X(p.x),Y(p.b),Y(p.a),p]);
- const ln=i=>pts.map((p,j)=>(j?'L':'M')+p[0].toFixed(1)+' '+p[i].toFixed(1)).join('');
- let g='';for(let i=0;i<=4;i++){const y=ym*i/4;g+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(y)}" y2="${Y(y)}" class="gl"/><text x="${pl-6}" y="${Y(y)+4}" text-anchor="end" class="ax">${sh(y)}</text>`;const x=xm*i/4;g+=`<text x="${X(x)}" y="${H-6}" text-anchor="${i==0?'start':i==4?'end':'middle'}" class="ax">${+x.toFixed(1)}y</text>`}
- $('#cs').setAttribute('viewBox',`0 0 ${W} ${H}`);
- $('#cs').innerHTML=`<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--b);stop-opacity:.5"/><stop offset="1" style="stop-color:var(--b);stop-opacity:0"/></linearGradient></defs>${g}<path d="${ln(1)}L${pts[pts.length-1][0]} ${Y(0)}L${pl} ${Y(0)}Z" fill="url(#ag)" class="${first?'fade':''}"/><path d="${ln(2)}" class="l2 ${first?'fade':''}"/><path d="${ln(1)}" pathLength="1" class="l1${first?' draw':''}"/><line id="hl" y1="${pt}" y2="${H-pb}" class="hl"/><circle id="hd" r="5" class="hd"/>`}
-$('#cs').addEventListener('pointermove',e=>{if(!pts.length)return;const r=e.currentTarget.getBoundingClientRect(),x=e.clientX-r.left;let b=pts[0];pts.forEach(p=>{if(Math.abs(p[0]-x)<Math.abs(b[0]-x))b=p});
- const h=$('#hl'),d=$('#hd'),t=$('#tip');h.setAttribute('x1',b[0]);h.setAttribute('x2',b[0]);h.style.opacity=1;d.setAttribute('cx',b[0]);d.setAttribute('cy',b[1]);d.style.opacity=1;
- t.innerHTML=`Year ${+b[3].x.toFixed(1)}<br>${last.l2}: <b>${f(b[3].b)}</b><br>${last.l1}: ${f(b[3].a)}`;t.style.opacity=1;t.style.left=Math.min(Math.max(b[0]-60,0),Math.max(0,r.width-150))+'px'});
-$('#cs').addEventListener('pointerleave',()=>{const h=$('#hl'),d=$('#hd');if(h){h.style.opacity=0;d.style.opacity=0}$('#tip').style.opacity=0});
-$('#flds').addEventListener('input',e=>{const t=e.target,j=t.dataset.j;if(j==null)return;const F=CALCS[ci].F[j];let v=parseFloat(t.value);if(isNaN(v))return;v=Math.min(F.max,Math.max(F.min,v));F.v=v;
- if(t.type=='range'){$('#n'+j).value=v}else{const r=$('#r'+j);r.value=v}fill($('#r'+j));run()});
-$('#flds').addEventListener('change',e=>{const j=e.target.dataset.j;if(j!=null&&e.target.type=='number')e.target.value=CALCS[ci].F[j].v});
-$('#flds').addEventListener('click',e=>{const b=e.target.closest('.seg button');if(!b)return;CALCS[ci].F[b.parentNode.dataset.j].v=+b.dataset.q;[...b.parentNode.children].forEach(x=>x.classList.toggle('on',x==b));run()});
-$('#tabs').innerHTML=CALCS.map((c,j)=>`<button class="tab${j?'':' on'}" data-j="${j}"><span>${c.ic}</span>${c.n}</button>`).join('');
-$('#tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;ci=+b.dataset.j;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x==b));b.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});build()});
-$('#cur').innerHTML=CURS.map((c,i)=>`<option value="${i}">${c[0]} ${c[1].trim()}</option>`).join('');
-$('#cur').addEventListener('change',e=>{S=CURS[e.target.value][1];L=CURS[e.target.value][2];build()});
-$('#th').addEventListener('click',()=>{const r=document.documentElement,dk=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dk?'light':'dark'});
-document.addEventListener('pointermove',e=>{const g=e.target.closest&&e.target.closest('.glass');if(!g)return;const r=g.getBoundingClientRect();g.style.setProperty('--mx',e.clientX-r.left+'px');g.style.setProperty('--my',e.clientY-r.top+'px')});
-let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{chart(false);rs()},150)});
-/* particle field */
-const cv=$('#fx'),cx=cv.getContext('2d');let P=[],W0,H0,mx=-999,my=-999,fr=0,dc='150,160,255';
-function rs(){const d=Math.min(devicePixelRatio||1,2);W0=innerWidth;H0=innerHeight;cv.width=W0*d;cv.height=H0*d;cx.setTransform(d,0,0,d,0,0);P=Array.from({length:Math.min(70,Math.round(W0*H0/20000))},()=>({x:Math.random()*W0,y:Math.random()*H0,vx:(Math.random()-.5)*.45,vy:(Math.random()-.5)*.45}))}
-addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY});
-function tick(){if(fr++%40==0)dc=getComputedStyle(document.documentElement).getPropertyValue('--dot').trim()||dc;cx.clearRect(0,0,W0,H0);
- for(const p of P){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W0)p.vx*=-1;if(p.y<0||p.y>H0)p.vy*=-1;cx.fillStyle=`rgba(${dc},.7)`;cx.beginPath();cx.arc(p.x,p.y,1.8,0,7);cx.fill()}
- for(let i=0;i<P.length;i++){for(let j=i+1;j<P.length;j++){const d=Math.hypot(P[i].x-P[j].x,P[i].y-P[j].y);if(d<110){cx.strokeStyle=`rgba(${dc},${.22*(1-d/110)})`;cx.beginPath();cx.moveTo(P[i].x,P[i].y);cx.lineTo(P[j].x,P[j].y);cx.stroke()}}
-  const d=Math.hypot(P[i].x-mx,P[i].y-my);if(d<150){cx.strokeStyle=`rgba(${dc},${.5*(1-d/150)})`;cx.beginPath();cx.moveTo(P[i].x,P[i].y);cx.lineTo(mx,my);cx.stroke()}}
- requestAnimationFrame(tick)}
-rs();tick();build();
-</script>
+  <script>
+    const $ = s => document.querySelector(s), C = 2 * Math.PI * 54;
+    const CURS = [['INR', '₹', 'en-IN'], ['USD', '$', 'en-US'], ['EUR', '€', 'en-IE'], ['AED', 'AED ', 'en-US']];
+    let ci = 0, S = '₹', L = 'en-IN', last = null, pts = [];
+    const f = n => S + Math.round(n).toLocaleString(L), sh = n => new Intl.NumberFormat(L, { notation: 'compact', maximumFractionDigits: 1 }).format(n);
+    const rdFV = (p, r, m) => { let s = 0; for (let k = 1; k <= m; k++)s += p * Math.pow(1 + r / 400, 4 * (m - k + 1) / 12); return s };
+    const CALCS = [
+      {
+        n: 'SIP', ic: '📈', d: 'Build wealth with disciplined monthly investing.',
+        F: [{ k: 'p', l: 'Monthly investment', min: 500, max: 200000, st: 500, v: 25000, u: 'c' }, { k: 'r', l: 'Expected return (p.a.)', min: 1, max: 30, st: .1, v: 12, u: '%' }, { k: 'y', l: 'Time period', min: 1, max: 40, st: 1, v: 10, u: 'yrs' }, { k: 's', l: 'Annual step-up', min: 0, max: 25, st: 1, v: 0, u: '%' }],
+        run(v) {
+          let i = v.r / 1200, b = 0, inv = 0, c = v.p, ser = [{ x: 0, a: 0, b: 0 }]; for (let m = 1; m <= v.y * 12; m++) { b = (b + c) * (1 + i); inv += c; if (m % 12 == 0) { ser.push({ x: m / 12, a: inv, b }); c *= 1 + v.s / 100 } }
+          return { main: ['Future value', b], st: [['Invested', inv], ['Est. returns', b - inv], ['Wealth gain', inv ? (b - inv) / inv * 100 : 0, 1]], a: inv, g: b - inv, la: 'Invested', lg: 'Returns', ser, l1: 'Invested', l2: 'Value' }
+        }
+      },
+      {
+        n: 'Lumpsum', ic: '💎', d: 'See what a one-time investment can become.',
+        F: [{ k: 'p', l: 'Total investment', min: 10000, max: 10000000, st: 10000, v: 500000, u: 'c' }, { k: 'r', l: 'Expected return (p.a.)', min: 1, max: 30, st: .1, v: 12, u: '%' }, { k: 'y', l: 'Time period', min: 1, max: 40, st: 1, v: 10, u: 'yrs' }],
+        run(v) { const g = t => v.p * Math.pow(1 + v.r / 100, t), fv = g(v.y); return { main: ['Maturity value', fv], st: [['Invested', v.p], ['Est. returns', fv - v.p], ['Multiple', fv / v.p, 2]], a: v.p, g: fv - v.p, la: 'Invested', lg: 'Returns', ser: Array.from({ length: v.y + 1 }, (_, t) => ({ x: t, a: v.p, b: g(t) })), l1: 'Invested', l2: 'Value' } }
+      },
+      {
+        n: 'Loan EMI', ic: '🏠', d: 'Home, car or personal loan, your monthly EMI at a glance.',
+        F: [{ k: 'p', l: 'Loan amount', min: 100000, max: 50000000, st: 50000, v: 2500000, u: 'c' }, { k: 'r', l: 'Interest rate (p.a.)', min: 1, max: 20, st: .05, v: 8.5, u: '%' }, { k: 'y', l: 'Loan tenure', min: 1, max: 30, st: 1, v: 20, u: 'yrs' }],
+        run(v) {
+          const i = v.r / 1200, m = v.y * 12, E = i ? v.p * i * Math.pow(1 + i, m) / (Math.pow(1 + i, m) - 1) : v.p / m, tot = E * m; let bal = v.p; const ser = [{ x: 0, a: 0, b: bal }];
+          for (let k = 1; k <= m; k++) { bal -= E - bal * i; if (k % 12 == 0) ser.push({ x: k / 12, a: E * k, b: Math.max(0, bal) }) }
+          return { main: ['Monthly EMI', E], st: [['Principal', v.p], ['Total interest', tot - v.p], ['Total payment', tot]], a: v.p, g: tot - v.p, la: 'Principal', lg: 'Interest', ser, l1: 'Paid so far', l2: 'Balance' }
+        }
+      },
+      {
+        n: 'RD', ic: '🏦', d: 'Recurring deposit with quarterly compounding.',
+        F: [{ k: 'p', l: 'Monthly deposit', min: 500, max: 100000, st: 500, v: 10000, u: 'c' }, { k: 'r', l: 'Interest rate (p.a.)', min: 1, max: 12, st: .1, v: 6.5, u: '%' }, { k: 'y', l: 'Time period', min: 1, max: 10, st: 1, v: 5, u: 'yrs' }],
+        run(v) { const fv = rdFV(v.p, v.r, v.y * 12), inv = v.p * v.y * 12; return { main: ['Maturity amount', fv], st: [['Total deposited', inv], ['Interest earned', fv - inv], ['Effective yield', inv ? (fv - inv) / inv * 100 : 0, 1]], a: inv, g: fv - inv, la: 'Deposited', lg: 'Interest', ser: Array.from({ length: v.y + 1 }, (_, t) => ({ x: t, a: v.p * 12 * t, b: rdFV(v.p, v.r, t * 12) })), l1: 'Deposited', l2: 'Value' } }
+      },
+      {
+        n: 'FD', ic: '🔒', d: 'Fixed deposit maturity with your choice of compounding.',
+        F: [{ k: 'p', l: 'Deposit amount', min: 10000, max: 10000000, st: 10000, v: 500000, u: 'c' }, { k: 'r', l: 'Interest rate (p.a.)', min: 1, max: 12, st: .1, v: 7, u: '%' }, { k: 'y', l: 'Time period', min: 1, max: 25, st: 1, v: 5, u: 'yrs' }, { k: 'q', l: 'Compounding', seg: ['Monthly', 'Quarterly', 'Yearly'], vals: [12, 4, 1], v: 1 }],
+        run(v) { const g = t => v.p * Math.pow(1 + v.r / (100 * v.q), v.q * t), fv = g(v.y); return { main: ['Maturity amount', fv], st: [['Deposited', v.p], ['Interest earned', fv - v.p], ['Total growth', (fv - v.p) / v.p * 100, 1]], a: v.p, g: fv - v.p, la: 'Deposited', lg: 'Interest', ser: Array.from({ length: v.y + 1 }, (_, t) => ({ x: t, a: v.p, b: g(t) })), l1: 'Deposited', l2: 'Value' } }
+      },
+      {
+        n: 'Lend Money', ic: '🤝', d: 'Interest earned when you lend, simple or compounded monthly.',
+        F: [{ k: 'p', l: 'Amount lent', min: 1000, max: 10000000, st: 1000, v: 100000, u: 'c' }, { k: 'r', l: 'Interest rate (p.a.)', min: .5, max: 60, st: .5, v: 18, u: '%' }, { k: 'y', l: 'Duration', min: .5, max: 20, st: .5, v: 3, u: 'yrs' }, { k: 'm', l: 'Interest type', seg: ['Simple', 'Compound'], vals: [0, 1], v: 0 }],
+        run(v) { const g = t => v.m ? v.p * Math.pow(1 + v.r / 1200, 12 * t) : v.p * (1 + v.r * t / 100), tot = g(v.y); return { main: ['Total to receive', tot], st: [['Principal', v.p], ['Interest earned', tot - v.p], ['Avg. per month', (tot - v.p) / (v.y * 12)]], a: v.p, g: tot - v.p, la: 'Principal', lg: 'Interest', ser: Array.from({ length: 11 }, (_, j) => ({ x: v.y * j / 10, a: v.p, b: g(v.y * j / 10) })), l1: 'Principal', l2: 'Amount' } }
+      },
+      {
+        n: 'CAGR', ic: '🚀', d: 'Find the annual growth rate between two values.',
+        F: [{ k: 'i', l: 'Initial value', min: 1000, max: 10000000, st: 1000, v: 100000, u: 'c' }, { k: 'e', l: 'Final value', min: 1000, max: 100000000, st: 1000, v: 250000, u: 'c' }, { k: 'y', l: 'Time period', min: 1, max: 40, st: 1, v: 5, u: 'yrs' }],
+        run(v) { const c = Math.pow(v.e / v.i, 1 / v.y) - 1; return { main: ['CAGR', c * 100, 1], st: [['Initial', v.i], ['Final', v.e], ['Absolute return', (v.e - v.i) / v.i * 100, 1]], a: v.i, g: Math.max(0, v.e - v.i), la: 'Initial', lg: 'Growth', ser: Array.from({ length: v.y + 1 }, (_, t) => ({ x: t, a: v.i, b: v.i * Math.pow(1 + c, t) })), l1: 'Initial', l2: 'Value' } }
+      },
+      { n: 'Insurance', ic: '🛡️', ins: 1, d: '', F: [] }
+    ];
+    const CATS = [['term', 'Protect my family', '🛡️', '#ff5fa2', 'Term Assurance', 'No maturity payout'], ['endow', 'Save for a goal', '🎯', '#8b7bff', 'Endowment', 'Non-linked savings'], ['mb', 'Regular payouts', '💸', '#f5a524', 'Money Back', 'Non-linked payouts'], ['wl', 'Lifelong cover', '♾️', '#14b8a6', 'Whole Life', 'Cover for life'], ['pen', 'Retirement income', '🌅', '#ff8a3d', 'Pension', 'Lifetime income'], ['ulip', 'Grow with the market', '📊', '#3d9bff', 'Unit Linked', 'Market risk'], ['hl', 'Health cover', '🩺', '#ef4565', 'Health Insurance', 'Health benefits'], ['mi', 'Small budget', '🌱', '#65b82e', 'Micro Insurance', 'Low cost']], CAT = Object.fromEntries(CATS.map(c => [c[0], c]));
+    const INS = [
+      ['term', 'LIC’s Digi Term', 876, '512N356V02', 'Online-only pure term plan: low premium and big cover for your family.'],
+      ['term', 'LIC’s Yuva Term', 875, '512N355V02', 'Term plan made for young buyers: pure cover at a low cost.'],
+      ['term', 'LIC’s Digi Credit Life', 878, '512N358V01', 'Online cover that tracks your loan, so family is not left with the debt.'],
+      ['term', 'LIC’s Yuva Credit Life', 877, '512N357V01', 'Loan-linked cover designed for young borrowers.'],
+      ['term', 'LIC’s New Tech-Term', 954, '512N351V02', 'Online pure term plan with simple, low-cost life cover.'],
+      ['term', 'LIC’s New Jeevan Amar', 955, '512N350V02', 'Classic term plan: a lump sum goes to your family if you pass away during the term.'],
+      ['term', 'LIC’s Saral Jeevan Bima', 859, '512N341V01', 'Simple, standard term plan with easy-to-understand basic features.'],
+      ['term', 'LIC’s Bima Kavach', 887, '512N360V01', 'Term plan focused on pure protection for your family.'],
+      ['endow', 'LIC’s Single Premium Endowment Plan', 717, '512N283V03', 'Pay once, get life cover plus a lump sum at the end.'],
+      ['endow', 'LIC’s New Endowment Plan', 714, '512N277V03', 'Regular savings with life cover; lump sum plus bonuses at maturity.'],
+      ['endow', 'LIC’s New Jeevan Anand', 715, '512N279V03', 'Get a maturity lump sum, and life cover continues for life after that.'],
+      ['endow', 'LIC’s Jeevan Lakshya', 733, '512N297V03', 'Built around a child’s future goals, with support for family if the parent is gone.'],
+      ['endow', 'LIC’s Jeevan Labh', 736, '512N304V03', 'Limited-premium savings plan with bonuses at maturity.'],
+      ['endow', 'LIC’s Amritbaal', 774, '512N365V02', 'Savings plan built around a child’s future needs.'],
+      ['endow', 'LIC’s Bima Jyoti', 760, '512N339V03', 'Savings plan with guaranteed additions plus life cover.'],
+      ['endow', 'LIC’s Nav Jeevan Shree', 912, '512N387V02', 'Non-linked savings plan with life cover.'],
+      ['endow', 'LIC’s Bima Lakshmi', 881, '512N389V01', 'Non-linked savings plan with life cover.'],
+      ['mb', 'LIC’s Bima Shree', 748, '512N316V03', 'Money-back plan for larger covers, with guaranteed additions.'],
+      ['mb', 'LIC’s New Money Back Plan – 20 Years', 720, '512N280V03', 'Get payouts during the 20-year term and the rest at maturity.'],
+      ['mb', 'LIC’s New Money Back Plan – 25 Years', 721, '512N278V03', 'Same idea over 25 years: regular payouts, then the balance at maturity.'],
+      ['mb', 'LIC’s New Children’s Money Back Plan', 732, '512N296V03', 'Money back timed for key milestones in a child’s life, like education.'],
+      ['mb', 'LIC’s Jeevan Tarun', 734, '512N299V03', 'Child plan with payouts timed for the study years.'],
+      ['wl', 'LIC’s Jeevan Umang', 745, '512N312V03', 'Lifelong cover plus a yearly income once your premiums end.'],
+      ['wl', 'LIC’s Jeevan Utsav', 771, '512N363V02', 'Whole-life plan with guaranteed regular income.'],
+      ['pen', 'LIC’s New Pension Plus', 867, '512L347V01', 'Market-linked pension plan: grow a retirement fund over time.', 'Market risk'],
+      ['pen', 'LIC’s Jeevan Akshay-VII', 857, '512N337V07', 'Immediate annuity: pay once, start getting income for life.'],
+      ['pen', 'LIC’s New Jeevan Shanti', 758, '512N338V08', 'Deferred annuity: invest now, get a pension later.'],
+      ['pen', 'LIC’s Saral Pension', 862, '512N342V05', 'Simple immediate annuity for a lifelong pension.'],
+      ['pen', 'LIC’s Smart Pension', 879, '512N386V01', 'Annuity plan for steady retirement income.'],
+      ['ulip', 'LIC’s Index Plus', 873, '512L354V01', 'Market-linked plan combining fund growth with life cover.'],
+      ['ulip', 'LIC’s Nivesh Plus', 749, '512L317V02', 'Single-premium market-linked plan: invest once, let it grow.'],
+      ['ulip', 'LIC’s SIIP', 752, '512L334V02', 'Regular-premium market-linked plan with life cover.'],
+      ['ulip', 'LIC’s Protection Plus', 886, '512L361V01', 'Market-linked plan that leans towards higher life cover.'],
+      ['hl', 'LIC’s Health Shield', 907, '512N369V01', 'Health protection plan for medical needs.'],
+      ['hl', 'LIC’s New Cancer Cover', 908, '512N370V01', 'Financial support if you are diagnosed with cancer.'],
+      ['mi', 'LIC’s Micro Bachat', 751, '512N329V03', 'Tiny-premium savings plus cover for low incomes.'],
+      ['mi', 'LIC’s Jan Suraksha', 880, '512N388V01', 'Low-cost micro cover built for small budgets.']];
+    let icat = 'all', iq = '';
+    function insUI() { const v = $('#iv'); if (!v.dataset.b) { v.dataset.b = 1; v.innerHTML = `<div class='glass ih'><h2>LIC plans, in plain words</h2><p class='mut'>Every plan currently listed on LIC’s official site, grouped by what it does for you. Tap a goal to filter.</p><div class='is'><span><b>${INS.length}</b> live plans</span><span><b>${CATS.length}</b> categories</span><span>Checked Oct 2026</span></div><div class='ich' id='ich'></div><input id='isq' type='search' placeholder='Search a plan, e.g. Jeevan, child, pension' aria-label='Search plans'></div><div class='ig' id='ig'></div><p class='src'>Source: LIC of India official website (<a href='https://originlic.licindia.in/insurance-plan' target='_blank' rel='noopener'>licindia.in</a>), plan pages updated between Jan and Oct 2026. Riders, group, GIFT City and withdrawn plans are not listed. Descriptions are simplified; confirm benefits, eligibility and premiums with LIC before buying.</p>`; $('#ich').addEventListener('click', e => { const b = e.target.closest('.ic'); if (!b) return; icat = b.dataset.c; insRender() }); $('#isq').addEventListener('input', e => { iq = e.target.value.toLowerCase(); insRender() }); $('#ig').addEventListener('click', e => { const b = e.target.closest('.cb'); if (b) openCalc(+b.dataset.n) }) } insRender() }
+    function insRender() { $('#ich').innerHTML = [['all', 'All plans', '✨', 'var(--a)']].concat(CATS.map(c => [c[0], c[1], c[2], c[3]])).map(c => `<button class='ic${icat == c[0] ? ' on' : ''}' data-c='${c[0]}' style='--cc:${c[3]}'>${c[2]} ${c[1]}<i>${c[0] == 'all' ? INS.length : INS.filter(p => p[0] == c[0]).length}</i></button>`).join(''); const L = INS.filter(p => (icat == 'all' || p[0] == icat) && (!iq || (p[1] + ' ' + p[4] + ' ' + CAT[p[0]][4]).toLowerCase().includes(iq))); $('#ig').innerHTML = L.length ? L.map((p, i) => { const c = CAT[p[0]]; return `<article class='pc' style='--cc:${c[3]};--i:${i}'><div class='pt'><span>${c[2]} ${c[4]}</span><em>Plan ${p[2]}</em></div><h3>${p[1]}</h3><p>${p[4]}</p><div class='pf'><b>${p[5] || c[5]}</b><small>UIN ${p[3]}</small></div><button class='cb' data-n='${p[2]}'>🧮 Calculate what you get</button></article>` }).join('') : "<div class='emp'>No plans match that search.</div>" }
+    const RATE = { 714: 5.5, 715: 5.5, 717: 5, 733: 5.5, 736: 5.5, 774: 5.5, 760: 5.5, 912: 5.5, 881: 5.5, 748: 5.5, 720: 5, 721: 5, 732: 5, 734: 5, 751: 4.5 };
+    function model(p) {
+      const n = p[2], c = p[0], r = RATE[n] || 5;
+      if (c == 'term') return { m: 'term', F: [['sa', 'Cover amount', 500000, 100000000, 500000, 10000000, 1], ['age', 'Your age', 18, 65, 1, 30], ['y', 'Policy term (years)', 5, 40, 1, 25]] };
+      if (n == 745) return { m: 'inc', pc: 8, F: [['sa', 'Sum assured', 200000, 10000000, 50000, 1000000, 1], ['age', 'Your age', 0, 55, 1, 30], ['ppt', 'Premium paying term (years)', 15, 30, 5, 20]] };
+      if (n == 771) return { m: 'inc', pc: 10, F: [['sa', 'Sum assured', 500000, 10000000, 50000, 1000000, 1], ['age', 'Your age', 0, 50, 1, 30], ['ppt', 'Premium paying term (years)', 5, 12, 1, 8]] };
+      if (n == 758) return { m: 'defann', F: [['price', 'Amount you invest', 100000, 50000000, 50000, 1000000, 1], ['d', 'Years to wait before pension', 5, 20, 1, 10], ['g', 'Assumed growth while waiting (%)', 3, 8, .1, 5.5], ['ar', 'Assumed annuity rate (%)', 4, 9, .1, 7]] };
+      if (c == 'pen' && n != 867) return { m: 'ann', F: [['price', 'Amount you invest', 100000, 50000000, 50000, 1000000, 1], ['ar', 'Assumed annuity rate (%)', 4, 9, .1, 6.5]] };
+      if (c == 'ulip' || n == 867) { const s = n == 749; return { m: 'ulip', s, pen: n == 867, F: s ? [['p', 'One-time investment', 100000, 10000000, 50000, 500000, 1], ['y', 'Years invested', 5, 30, 1, 10], ['r', 'Assumed market return (%)', 4, 15, .1, 10]] : [['p', 'Yearly premium', 10000, 1000000, 5000, 100000, 1], ['y', 'Years invested', 5, 30, 1, 15], ['r', 'Assumed market return (%)', 4, 15, .1, 10]] } }
+      if (c == 'hl' || n == 880) return { m: 'cov', F: [['cov', 'Cover amount', 100000, 10000000, 100000, 500000, 1]] };
+      if (n == 717) return { m: 'sav', s: 1, F: [['p', 'One-time premium', 50000, 10000000, 10000, 500000, 1], ['y', 'Policy term (years)', 5, 30, 1, 10], ['r', 'Assumed return (%)', 2, 8, .1, r]] };
+      return { m: 'sav', F: [['p', 'Yearly premium', 5000, 1000000, 5000, 100000, 1], ['ppt', 'Years you pay premium', 5, 40, 1, 15], ['y', 'Policy term (years)', 5, 40, 1, 20], ['r', 'Assumed return (%)', 2, 8, .1, r]] }
+    }
+    function mcalc(m, v) {
+      const fv = (p, n, r, pay) => { let b = 0; for (let t = 1; t <= n; t++) { if (t <= pay) b += p; b *= 1 + r / 100 } return b };
+      if (m.m == 'term') { const pr = v.sa / 1e5 * 95 * Math.pow(1.075, v.age - 25) * (1 + (v.y - 20) * .004); return { main: ['Cover for your family', v.sa], st: [['Est. yearly premium', pr], ['Total premium over term', pr * v.y], ['Cover per ' + S.trim() + '1 of yearly premium', v.sa / pr, 2]], note: 'Pays only if the insured person passes away during the term; nothing is paid at the end. The premium is a rough guess: your real price depends on health, smoking and gender.' } }
+      if (m.m == 'inc') { const i = v.sa * m.pc / 100, s = v.age + v.ppt, y = Math.max(0, 100 - s); return { main: ['Yearly income you can count on', i], st: [['Income starts at age', s, 3], ['Years of income', y, 3], ['Total income to age 100', i * y]], note: 'Income is ' + m.pc + '% of the sum assured each year after the premium term. The sum assured (plus any bonus) is also paid at the end. Your premium depends on your age, so ask LIC for a quote.' } }
+      if (m.m == 'ann') { const y = v.price * v.ar / 100; return { main: ['Pension every year', y], st: [['Per month', y / 12], ['Years to earn back your money', 100 / v.ar, 4]], note: 'Annuity rates change with your age, pension option and LIC’s current rates. Edit the rate to match your quote.' } }
+      if (m.m == 'defann') { const c = v.price * Math.pow(1 + v.g / 100, v.d), y = c * v.ar / 100; return { main: ['Pension every year after waiting', y], st: [['Fund when pension starts', c], ['Per month', y / 12], ['Years before pension starts', v.d, 3]], note: 'Both rates are assumptions. Edit them to match your LIC quote.' } }
+      if (m.m == 'ulip') { const rn = v.r - 1.5, b = m.s ? v.p * Math.pow(1 + rn / 100, v.y) : fv(v.p, v.y, rn, v.y), paid = m.s ? v.p : v.p * v.y; return { main: ['Estimated fund value', b], st: [['Total invested', paid], ['Est. growth', b - paid], m.pen ? ['Pension per year at 6% annuity', b * .06] : ['Min. cover (approx.)', m.s ? v.p * 1.25 : v.p * 10]], note: 'Market-linked: returns are not guaranteed and can be lower or even negative. We subtract 1.5% a year for assumed charges.' } }
+      if (m.m == 'cov') return { main: ['Cover you choose', v.cov], st: [], note: 'The actual benefit depends on the option, waiting period and conditions in LIC’s policy document. Ask LIC for exact terms.' };
+      const y = Math.max(v.y, m.s ? v.y : v.ppt), b = m.s ? v.p * Math.pow(1 + v.r / 100, v.y) : fv(v.p, y, v.r, v.ppt), paid = m.s ? v.p : v.p * v.ppt; return { main: ['Estimated amount you get', b], st: [['Total you pay', paid], ['Est. gain', b - paid], m.s ? ['Life cover (approx. 125%)', v.p * 1.25] : ['Life cover (approx. 10×)', v.p * 10]], note: 'Estimate using a steady yearly return that you can edit. Real payouts include LIC bonuses and guaranteed additions that vary, and money-back plans pay in instalments.' }
+    }
+    let cm = null;
+    function mRun() { const r = mcalc(cm.m, cm.v); $('#mbl').textContent = r.main[0]; cnt($('#mbig'), r.main[1], r.main[2]); const s = $('#mst'); if (s.children.length != r.st.length) s.innerHTML = r.st.map(() => `<div class='st'><small></small><b>0</b></div>`).join(''); r.st.forEach((q, j) => { const e = s.children[j]; e.firstChild.textContent = q[0]; cnt(e.lastChild, q[1], q[2]) }); $('#mnt').textContent = r.note + ' Illustration only, not an LIC quote.' }
+    function openCalc(n) {
+      const p = INS.find(x => x[2] == n), m = model(p), c = CAT[p[0]]; cm = { p, m, v: {} }; m.F.forEach(f => cm.v[f[0]] = f[5]); const d = document.createElement('div'); d.id = 'md';
+      d.innerHTML = `<div class='mp' style='--cc:${c[3]}'><button class='mx' aria-label='Close'>✕</button><div class='pt'><span>${c[2]} ${c[4]}</span><em>Plan ${p[2]}</em></div><h2>${p[1]}</h2><p class='mut'>Change the numbers and see what you could get.</p>${m.F.map((x, j) => `<div class='f'><div class='r'><label for='mn${j}'>${x[1]}</label><div class='num'><span>${x[6] ? S.trim() : ''}</span><input id='mn${j}' data-j='${j}' type='number' inputmode='decimal' min='${x[2]}' max='${x[3]}' step='${x[4]}' value='${x[5]}'></div></div><input id='mr${j}' data-j='${j}' type='range' min='${x[2]}' max='${x[3]}' step='${x[4]}' value='${x[5]}'></div>`).join('')}<div class='hero' style='margin-top:18px'><small id='mbl'></small><div class='big' id='mbig'>0</div></div><div class='stats' id='mst'></div><p class='src' id='mnt'></p></div>`;
+      d.addEventListener('click', e => { if (e.target == d || e.target.closest('.mx')) closeCalc() });
+      d.addEventListener('input', e => { const t = e.target, j = t.dataset.j; if (j == null) return; const x = cm.m.F[j]; let v = parseFloat(t.value); if (isNaN(v)) return; v = Math.min(x[3], Math.max(x[2], v)); cm.v[x[0]] = v; if (t.type == 'range') $('#mn' + j).value = v; else $('#mr' + j).value = v; fill($('#mr' + j)); mRun() });
+      document.body.appendChild(d); document.body.style.overflow = 'hidden'; d.querySelectorAll('input[type=range]').forEach(fill); mRun()
+    }
+    function closeCalc() { const d = $('#md'); if (d) d.remove(); document.body.style.overflow = '' }
+    addEventListener('keydown', e => { if (e.key == 'Escape') closeCalc() });
+    function cnt(el, to, pct) { const from = el._v || 0; el._v = to; cancelAnimationFrame(el._r); const t0 = performance.now(); (function s(t) { const k = Math.min(1, (t - t0) / 650), e = 1 - Math.pow(1 - k, 3), v = from + (to - from) * e; el.textContent = pct == 3 ? Math.round(v) : pct == 4 ? v.toFixed(1) + ' yrs' : pct ? v.toFixed(2) + (pct == 2 ? '×' : '%') : f(v); if (k < 1) el._r = requestAnimationFrame(s) })(t0) }
+    const fill = r => r.style.setProperty('--p', (r.value - r.min) / (r.max - r.min) * 100 + '%');
+    function build() {
+      const c = CALCS[ci]; $('#cv').hidden = !!c.ins; $('#iv').hidden = !c.ins; if (c.ins) { insUI(); return } $('#ttl').textContent = c.n + ' Calculator'; $('#dsc').textContent = c.d; $('#big')._v = 0; $('#stats').innerHTML = '';
+      $('#flds').innerHTML = c.F.map((x, j) => x.seg ? `<div class="f"><label>${x.l}</label><div class="seg" data-j="${j}">${x.seg.map((s, q) => `<button data-q="${q}" class="${q == x.v ? 'on' : ''}">${s}</button>`).join('')}</div></div>` :
+        `<div class="f"><div class="r"><label for="n${j}">${x.l}</label><div class="num"><span>${x.u == 'c' ? S.trim() : ''}</span><input id="n${j}" data-j="${j}" type="number" inputmode="decimal" min="${x.min}" max="${x.max}" step="${x.st}" value="${x.v}"><span>${x.u == 'c' ? '' : x.u}</span></div></div><input id="r${j}" data-j="${j}" type="range" min="${x.min}" max="${x.max}" step="${x.st}" value="${x.v}"></div>`).join('');
+      document.querySelectorAll('#flds input[type=range]').forEach(fill); run(true)
+    }
+    function run(first) {
+      const c = CALCS[ci], v = {}; c.F.forEach(x => v[x.k] = x.seg ? x.vals[x.v] : x.v); const r = last = c.run(v);
+      $('#bl').textContent = r.main[0]; cnt($('#big'), r.main[1], r.main[2]);
+      const s = $('#stats'); if (s.children.length != r.st.length) s.innerHTML = r.st.map(() => '<div class="st"><small></small><b>0</b></div>').join('');
+      r.st.forEach((q, j) => { const e = s.children[j]; e.firstChild.textContent = q[0]; cnt(e.lastChild, q[1], q[2]) });
+      const g = Math.max(0, r.g), T = r.a + g || 1, pa = r.a / T; $('#da').style.strokeDasharray = `${C * pa} ${C}`; $('#dp').textContent = Math.round((1 - pa) * 100) + '%'; $('#ds').textContent = r.lg.toLowerCase();
+      $('#lg').innerHTML = `<div class="lg"><i style="background:var(--a)"></i>${r.la}<b>${f(r.a)}</b></div><div class="lg"><i style="background:var(--c)"></i>${r.lg}<b>${f(g)}</b></div>`;
+      $('#cl').innerHTML = `<span><i style="background:var(--b)"></i>${r.l2}</span><span><i style="background:var(--a)"></i>${r.l1}</span>`; chart(first)
+    }
+    function chart(first) {
+      if (!last) return; const W = $('#chart').clientWidth || 320, H = 230, pl = 46, pr = 8, pt = 10, pb = 24, s = last.ser, xm = s[s.length - 1].x || 1, ym = Math.max(...s.map(p => Math.max(p.a, p.b))) * 1.08 || 1;
+      const X = x => pl + (W - pl - pr) * x / xm, Y = y => H - pb - (H - pt - pb) * y / ym; pts = s.map(p => [X(p.x), Y(p.b), Y(p.a), p]);
+      const ln = i => pts.map((p, j) => (j ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[i].toFixed(1)).join('');
+      let g = ''; for (let i = 0; i <= 4; i++) { const y = ym * i / 4; g += `<line x1="${pl}" x2="${W - pr}" y1="${Y(y)}" y2="${Y(y)}" class="gl"/><text x="${pl - 6}" y="${Y(y) + 4}" text-anchor="end" class="ax">${sh(y)}</text>`; const x = xm * i / 4; g += `<text x="${X(x)}" y="${H - 6}" text-anchor="${i == 0 ? 'start' : i == 4 ? 'end' : 'middle'}" class="ax">${+x.toFixed(1)}y</text>` }
+      $('#cs').setAttribute('viewBox', `0 0 ${W} ${H}`);
+      $('#cs').innerHTML = `<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--b);stop-opacity:.5"/><stop offset="1" style="stop-color:var(--b);stop-opacity:0"/></linearGradient></defs>${g}<path d="${ln(1)}L${pts[pts.length - 1][0]} ${Y(0)}L${pl} ${Y(0)}Z" fill="url(#ag)" class="${first ? 'fade' : ''}"/><path d="${ln(2)}" class="l2 ${first ? 'fade' : ''}"/><path d="${ln(1)}" pathLength="1" class="l1${first ? ' draw' : ''}"/><line id="hl" y1="${pt}" y2="${H - pb}" class="hl"/><circle id="hd" r="5" class="hd"/>`
+    }
+    $('#cs').addEventListener('pointermove', e => {
+      if (!pts.length) return; const r = e.currentTarget.getBoundingClientRect(), x = e.clientX - r.left; let b = pts[0]; pts.forEach(p => { if (Math.abs(p[0] - x) < Math.abs(b[0] - x)) b = p });
+      const h = $('#hl'), d = $('#hd'), t = $('#tip'); h.setAttribute('x1', b[0]); h.setAttribute('x2', b[0]); h.style.opacity = 1; d.setAttribute('cx', b[0]); d.setAttribute('cy', b[1]); d.style.opacity = 1;
+      t.innerHTML = `Year ${+b[3].x.toFixed(1)}<br>${last.l2}: <b>${f(b[3].b)}</b><br>${last.l1}: ${f(b[3].a)}`; t.style.opacity = 1; t.style.left = Math.min(Math.max(b[0] - 60, 0), Math.max(0, r.width - 150)) + 'px'
+    });
+    $('#cs').addEventListener('pointerleave', () => { const h = $('#hl'), d = $('#hd'); if (h) { h.style.opacity = 0; d.style.opacity = 0 } $('#tip').style.opacity = 0 });
+    $('#flds').addEventListener('input', e => {
+      const t = e.target, j = t.dataset.j; if (j == null) return; const F = CALCS[ci].F[j]; let v = parseFloat(t.value); if (isNaN(v)) return; v = Math.min(F.max, Math.max(F.min, v)); F.v = v;
+      if (t.type == 'range') { $('#n' + j).value = v } else { const r = $('#r' + j); r.value = v } fill($('#r' + j)); run()
+    });
+    $('#flds').addEventListener('change', e => { const j = e.target.dataset.j; if (j != null && e.target.type == 'number') e.target.value = CALCS[ci].F[j].v });
+    $('#flds').addEventListener('click', e => { const b = e.target.closest('.seg button'); if (!b) return; CALCS[ci].F[b.parentNode.dataset.j].v = +b.dataset.q;[...b.parentNode.children].forEach(x => x.classList.toggle('on', x == b)); run() });
+    $('#tabs').innerHTML = CALCS.map((c, j) => `<button class="tab${j ? '' : ' on'}" data-j="${j}"><span>${c.ic}</span>${c.n}</button>`).join('');
+    $('#tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; ci = +b.dataset.j; document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x == b)); b.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); build() });
+    $('#cur').innerHTML = CURS.map((c, i) => `<option value="${i}">${c[0]} ${c[1].trim()}</option>`).join('');
+    $('#cur').addEventListener('change', e => { S = CURS[e.target.value][1]; L = CURS[e.target.value][2]; build() });
+    $('#th').addEventListener('click', () => { const r = document.documentElement, dk = r.dataset.theme ? r.dataset.theme == 'dark' : matchMedia('(prefers-color-scheme:dark)').matches; r.dataset.theme = dk ? 'light' : 'dark' });
+    document.addEventListener('pointermove', e => { const g = e.target.closest && e.target.closest('.glass'); if (!g) return; const r = g.getBoundingClientRect(); g.style.setProperty('--mx', e.clientX - r.left + 'px'); g.style.setProperty('--my', e.clientY - r.top + 'px') });
+    let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { chart(false); rs() }, 150) });
+    /* particle field */
+    const cv = $('#fx'), cx = cv.getContext('2d'); let P = [], W0, H0, mx = -999, my = -999, fr = 0, dc = '150,160,255';
+    function rs() { const d = Math.min(devicePixelRatio || 1, 2); W0 = innerWidth; H0 = innerHeight; cv.width = W0 * d; cv.height = H0 * d; cx.setTransform(d, 0, 0, d, 0, 0); P = Array.from({ length: Math.min(70, Math.round(W0 * H0 / 20000)) }, () => ({ x: Math.random() * W0, y: Math.random() * H0, vx: (Math.random() - .5) * .45, vy: (Math.random() - .5) * .45 })) }
+    addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY });
+    function tick() {
+      if (fr++ % 40 == 0) dc = getComputedStyle(document.documentElement).getPropertyValue('--dot').trim() || dc; cx.clearRect(0, 0, W0, H0);
+      for (const p of P) { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > W0) p.vx *= -1; if (p.y < 0 || p.y > H0) p.vy *= -1; cx.fillStyle = `rgba(${dc},.7)`; cx.beginPath(); cx.arc(p.x, p.y, 1.8, 0, 7); cx.fill() }
+      for (let i = 0; i < P.length; i++) {
+        for (let j = i + 1; j < P.length; j++) { const d = Math.hypot(P[i].x - P[j].x, P[i].y - P[j].y); if (d < 110) { cx.strokeStyle = `rgba(${dc},${.22 * (1 - d / 110)})`; cx.beginPath(); cx.moveTo(P[i].x, P[i].y); cx.lineTo(P[j].x, P[j].y); cx.stroke() } }
+        const d = Math.hypot(P[i].x - mx, P[i].y - my); if (d < 150) { cx.strokeStyle = `rgba(${dc},${.5 * (1 - d / 150)})`; cx.beginPath(); cx.moveTo(P[i].x, P[i].y); cx.lineTo(mx, my); cx.stroke() }
+      }
+      requestAnimationFrame(tick)
+    }
+    rs(); tick(); build();
+  </script>
 </body>
+
 </html>
